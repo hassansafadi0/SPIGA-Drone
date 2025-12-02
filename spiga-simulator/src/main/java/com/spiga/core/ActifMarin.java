@@ -1,0 +1,95 @@
+package com.spiga.core;
+
+import com.spiga.env.ZoneOperation;
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class ActifMarin extends ActifMobile {
+
+    public ActifMarin(String id, Point3D position, double vitesseMax, double autonomieMax) {
+        super(id, position, vitesseMax, autonomieMax);
+    }
+
+    @Override
+    public void deplacer(Point3D cible, ZoneOperation zone) {
+        if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() <= 0) {
+            return;
+        }
+
+        if (getEtat() == EtatOperationnel.AU_SOL) {
+            setEtat(EtatOperationnel.EN_MISSION);
+        }
+
+        // Similar logic but with currents
+        Point3D courant = zone.getCourantMarin();
+
+        double dx = cible.getX() - getPosition().getX();
+        double dy = cible.getY() - getPosition().getY();
+        double dz = cible.getZ() - getPosition().getZ();
+        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+        if (distance == 0)
+            return;
+
+        double nx = dx / distance;
+        double ny = dy / distance;
+        double nz = dz / distance;
+
+        double speed = getVitesseMax();
+
+        if (speed > distance) {
+            speed = distance;
+        }
+
+        double moveX = nx * speed;
+        double moveY = ny * speed;
+        double moveZ = nz * speed;
+
+        // Apply current
+        moveX += courant.getX();
+        moveY += courant.getY();
+        moveZ += courant.getZ();
+
+        Point3D newPos = new Point3D(
+                getPosition().getX() + moveX,
+                getPosition().getY() + moveY,
+                getPosition().getZ() + moveZ);
+
+        if (!zone.isInside(newPos)) {
+            // System.out.println(getId() + " : Sortie de zone !");
+            return;
+        }
+        if (zone.isCollision(newPos)) {
+            // System.out.println(getId() + " : Collision !");
+            notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);
+            return;
+        }
+
+        setPosition(newPos);
+
+        double consumption = 1.0;
+        // Current opposition
+        // Simplified
+        if (courant.getX() != 0 || courant.getY() != 0 || courant.getZ() != 0) {
+            consumption += 0.5;
+        }
+
+        setAutonomieActuelle(getAutonomieActuelle() - consumption);
+        if (getAutonomieActuelle() <= 0) {
+            setAutonomieActuelle(0);
+            setEtat(EtatOperationnel.EN_PANNE);
+            notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);
+        }
+
+        // System.out.println(getId() + " moved to " + getPosition() + ". Autonomy: " +
+        // getAutonomieActuelle());
+    }
+
+    @Override
+    public List<Point3D> calculerTrajet(Point3D cible) {
+        List<Point3D> path = new ArrayList<>();
+        path.add(getPosition());
+        path.add(cible);
+        return path;
+    }
+}
