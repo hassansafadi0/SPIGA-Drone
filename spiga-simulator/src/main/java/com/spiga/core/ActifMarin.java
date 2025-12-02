@@ -20,16 +20,36 @@ public abstract class ActifMarin extends ActifMobile {
             setEtat(EtatOperationnel.EN_MISSION);
         }
 
+        // Pathfinding Logic
+        if (getCurrentPath().isEmpty()) {
+            // Calculate path if empty
+            List<Point3D> path = zone.findPath(getPosition(), cible, true); // true = isMarine
+            setCurrentPath(path);
+        }
+
+        // Get next waypoint
+        Point3D nextPoint = cible;
+        if (!getCurrentPath().isEmpty()) {
+            nextPoint = getCurrentPath().get(0);
+        }
+
         // Similar logic but with currents
         Point3D courant = zone.getCourantMarin();
 
-        double dx = cible.getX() - getPosition().getX();
-        double dy = cible.getY() - getPosition().getY();
-        double dz = cible.getZ() - getPosition().getZ();
+        double dx = nextPoint.getX() - getPosition().getX();
+        double dy = nextPoint.getY() - getPosition().getY();
+        double dz = nextPoint.getZ() - getPosition().getZ();
         double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-        if (distance == 0)
-            return;
+        if (distance < 5.0) { // Reached waypoint
+            if (!getCurrentPath().isEmpty()) {
+                getCurrentPath().remove(0); // Remove reached point
+                if (getCurrentPath().isEmpty())
+                    return; // Reached final target
+                // Recurse or wait for next update to move to next point
+                return;
+            }
+        }
 
         double nx = dx / distance;
         double ny = dy / distance;
@@ -62,6 +82,12 @@ public abstract class ActifMarin extends ActifMobile {
         if (zone.isCollision(newPos)) {
             // System.out.println(getId() + " : Collision !");
             notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);
+            return;
+        }
+
+        // Check Land Collision (for Marine)
+        if (zone.isLand(newPos)) {
+            // System.out.println("Marine vehicle hit land!");
             return;
         }
 

@@ -81,7 +81,8 @@ public class SimulationView extends Pane {
 
         // Constraints
         String type = selectedAsset.getClass().getSimpleName();
-        boolean isLand = wx < 500; // World coordinate boundary
+        Point3D target = new Point3D(wx, wy, wz);
+        boolean isLand = zone.isLand(target);
 
         if (type.contains("VehiculeTerrestre") && !isLand) {
             System.out.println("Cannot move Car to Sea!");
@@ -92,7 +93,7 @@ public class SimulationView extends Pane {
             return;
         }
 
-        selectedAsset.setTarget(new Point3D(wx, wy, wz));
+        selectedAsset.setTarget(target);
         System.out.println("Moving " + selectedAsset.getId() + " to " + wx + ", " + wy);
     }
 
@@ -141,15 +142,27 @@ public class SimulationView extends Pane {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Draw Terrain (Split view: Left Land, Right Sea)
-        // Land (0 to 500 world -> 0 to 450 canvas)
-        double splitX = 500 * SCALE;
-
-        gc.setFill(Color.LIGHTGREEN);
-        gc.fillRect(0, 0, splitX, 900);
-        // Sea
+        // Draw Terrain (Water Background)
         gc.setFill(Color.LIGHTBLUE);
-        gc.fillRect(splitX, 0, 900 - splitX, 900);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        // Draw Islands
+        gc.setFill(Color.LIGHTGREEN);
+        for (com.spiga.env.ZoneOperation.Island island : zone.getIslands()) {
+            if (island.isCircle) {
+                double r = island.w; // radius
+                double x = (island.x - r) * SCALE;
+                double y = (island.y - r) * SCALE;
+                double d = r * 2 * SCALE;
+                gc.fillOval(x, y, d, d);
+            } else {
+                double w = island.w * SCALE;
+                double h = island.h * SCALE;
+                double x = (island.x - island.w / 2) * SCALE;
+                double y = (island.y - island.h / 2) * SCALE;
+                gc.fillRect(x, y, w, h);
+            }
+        }
 
         // Grid lines
         gc.setStroke(Color.GRAY);

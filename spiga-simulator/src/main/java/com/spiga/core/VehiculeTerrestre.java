@@ -28,15 +28,34 @@ public class VehiculeTerrestre extends ActifMobile {
             setEtat(EtatOperationnel.EN_MISSION);
         }
 
+        // Pathfinding Logic
+        if (getCurrentPath().isEmpty()) {
+            // Calculate path if empty
+            List<Point3D> path = zone.findPath(getPosition(), cible, false); // false = isLand (not Marine)
+            setCurrentPath(path);
+        }
+
+        // Get next waypoint
+        Point3D nextPoint = cible;
+        if (!getCurrentPath().isEmpty()) {
+            nextPoint = getCurrentPath().get(0);
+        }
+
         // Simple movement logic on ground (2D)
-        double dx = cible.getX() - getPosition().getX();
-        double dy = cible.getY() - getPosition().getY();
+        double dx = nextPoint.getX() - getPosition().getX();
+        double dy = nextPoint.getY() - getPosition().getY();
         // Ignore Z difference for movement direction, we stay on ground
 
         double distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance == 0)
-            return;
+        if (distance < 5.0) { // Reached waypoint
+            if (!getCurrentPath().isEmpty()) {
+                getCurrentPath().remove(0); // Remove reached point
+                if (getCurrentPath().isEmpty())
+                    return; // Reached final target
+                return;
+            }
+        }
 
         double nx = dx / distance;
         double ny = dy / distance;
@@ -60,6 +79,12 @@ public class VehiculeTerrestre extends ActifMobile {
         }
         if (zone.isCollision(newPos)) {
             notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);
+            return;
+        }
+
+        // Check Water Collision (for Land Vehicle)
+        if (!zone.isLand(newPos)) {
+            // System.out.println("Car hit water!");
             return;
         }
 

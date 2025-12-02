@@ -22,8 +22,10 @@ com/spiga/core/DroneReconnaissance.class
 com/spiga/core/ActifAerien.class
 com/spiga/mission/MissionReconnaissance.class
 com/spiga/core/TypeAlerte.class
+com/spiga/env/ZoneOperation$Island.class
 com/spiga/env/Obstacle.class
 com/spiga/core/Alertable.class
 com/spiga/ui/SimulationView$1.class
 com/spiga/env/ZoneOperation.class
 com/spiga/core/ActifMarin.class
+com/spiga/env/ZoneOperation$Node.class

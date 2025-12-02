@@ -11,6 +11,7 @@ public abstract class ActifMobile implements Deplacable, Rechargeable, Communica
     private double autonomieActuelle;
     private EtatOperationnel etat;
     private Point3D target; // Individual target for movement
+    private java.util.List<Point3D> currentPath; // Path to follow
 
     public ActifMobile(String id, Point3D position, double vitesseMax, double autonomieMax) {
         this.id = id;
@@ -20,6 +21,7 @@ public abstract class ActifMobile implements Deplacable, Rechargeable, Communica
         this.autonomieActuelle = autonomieMax;
         this.etat = EtatOperationnel.AU_SOL; // Default state
         this.target = null; // No target initially
+        this.currentPath = new java.util.ArrayList<>();
     }
 
     public Point3D getTarget() {
@@ -28,6 +30,17 @@ public abstract class ActifMobile implements Deplacable, Rechargeable, Communica
 
     public void setTarget(Point3D target) {
         this.target = target;
+        // Path calculation will be triggered by subclasses or manually
+        // For now, clear path so it recalculates
+        this.currentPath.clear();
+    }
+
+    public java.util.List<Point3D> getCurrentPath() {
+        return currentPath;
+    }
+
+    public void setCurrentPath(java.util.List<Point3D> path) {
+        this.currentPath = path;
     }
 
     public String getId() {

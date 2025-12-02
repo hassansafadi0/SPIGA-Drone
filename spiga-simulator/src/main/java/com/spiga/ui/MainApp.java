@@ -22,12 +22,15 @@ public class MainApp extends Application {
         // Min Z is -1000 to allow submarines (underwater)
         zone = new ZoneOperation(new Point3D(0, 0, -1000), new Point3D(1000, 1000, 1000));
 
-        // Add sample assets (Ensure Marine assets are in Sea > 500)
+        // Add sample assets
+        // Drones (Air)
         gestionnaire.ajouterActif(new com.spiga.core.DroneReconnaissance("D1", new Point3D(100, 100, 50)));
         gestionnaire.ajouterActif(new com.spiga.core.DroneLogistique("D2", new Point3D(200, 200, 50)));
-        gestionnaire.ajouterActif(new com.spiga.core.VehiculeSurface("S1", new Point3D(600, 600, 0))); // Sea
-        gestionnaire.ajouterActif(new com.spiga.core.VehiculeSousMarin("U1", new Point3D(700, 700, -50))); // Sea
-        gestionnaire.ajouterActif(new com.spiga.core.VehiculeTerrestre("C1", new Point3D(150, 300, 0))); // Land
+        // Marine (Water) - Avoid Islands (300,300) and (700,700)
+        gestionnaire.ajouterActif(new com.spiga.core.VehiculeSurface("S1", new Point3D(100, 800, 0)));
+        gestionnaire.ajouterActif(new com.spiga.core.VehiculeSousMarin("U1", new Point3D(800, 100, -50)));
+        // Land (Islands) - Island 1 is at (300,300)
+        gestionnaire.ajouterActif(new com.spiga.core.VehiculeTerrestre("C1", new Point3D(300, 300, 0)));
 
         // Initialize UI Components
         simulationView = new SimulationView(zone, gestionnaire);
@@ -51,19 +54,19 @@ public class MainApp extends Application {
             // Validation Logic
             boolean isMarine = type.contains("Surface") || type.contains("SousMarin");
             boolean isLandVehicle = type.contains("VehiculeTerrestre");
-            boolean isLand = pos.getX() < 500; // In world coords (1000x1000), < 500 is land (left half)
+            boolean isLand = zone.isLand(pos);
 
             if (isMarine && isLand) {
                 javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
                         javafx.scene.control.Alert.AlertType.ERROR);
-                alert.setContentText("Marine assets cannot spawn on land (X < 500)!");
+                alert.setContentText("Marine assets cannot spawn on land!");
                 alert.showAndWait();
                 return;
             }
             if (isLandVehicle && !isLand) {
                 javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
                         javafx.scene.control.Alert.AlertType.ERROR);
-                alert.setContentText("Land vehicles cannot spawn in sea (X >= 500)!");
+                alert.setContentText("Land vehicles cannot spawn in sea!");
                 alert.showAndWait();
                 return;
             }
