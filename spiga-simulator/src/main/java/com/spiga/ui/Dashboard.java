@@ -7,7 +7,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import java.util.function.BiConsumer;
+
 import java.util.function.Consumer;
 
 public class Dashboard extends VBox {

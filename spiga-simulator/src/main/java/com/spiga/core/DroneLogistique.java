@@ -30,6 +30,15 @@ public class DroneLogistique extends ActifAerien {
         this(id, position, 10.0);
     }
 
+    /**
+     * Gets the cargo capacity.
+     * 
+     * @return The capacity in kg.
+     */
+    public double getCapaciteEmport() {
+        return capaciteEmport;
+    }
+
     @Override
     public void envoyerMessage(String destinataire, String message) {
         System.out.println(getId() + " (Logistique) envoie à " + destinataire + ": " + message);

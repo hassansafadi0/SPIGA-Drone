@@ -56,4 +56,13 @@ public abstract class Mission {
     public StatutMission getStatut() {
         return statut;
     }
+
+    /**
+     * Gets the mission objective.
+     * 
+     * @return The objective of the mission.
+     */
+    public ObjectifMission getObjectif() {
+        return objectif;
+    }
 }

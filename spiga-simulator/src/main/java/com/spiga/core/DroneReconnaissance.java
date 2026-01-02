@@ -30,6 +30,15 @@ public class DroneReconnaissance extends ActifAerien {
         this(id, position, 500.0);
     }
 
+    /**
+     * Gets the sensor radius.
+     * 
+     * @return The sensor radius in meters.
+     */
+    public double getRayonCapteur() {
+        return rayonCapteur;
+    }
+
     @Override
     public void envoyerMessage(String destinataire, String message) {
         System.out.println(getId() + " (Recon) envoie à " + destinataire + ": " + message);
