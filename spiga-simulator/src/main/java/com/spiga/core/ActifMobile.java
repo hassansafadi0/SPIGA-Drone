@@ -1,9 +1,20 @@
 package com.spiga.core;
 
 import com.spiga.env.ZoneOperation;
-import java.util.List;
 
-public abstract class ActifMobile implements Deplacable, Rechargeable, Communicable, Pilotable, Alertable {
+/**
+ * Abstract base class for all mobile assets in the simulation.
+ * Implements core interfaces for movement, energy management, communication,
+ * and piloting.
+ */
+import com.spiga.env.Collidable;
+
+/**
+ * Abstract base class for all mobile assets in the simulation.
+ * Implements core interfaces for movement, energy management, communication,
+ * and piloting.
+ */
+public abstract class ActifMobile implements Deplacable, Rechargeable, Communicable, Pilotable, Alertable, Collidable {
     private String id;
     private Point3D position;
     private double vitesseMax;
@@ -12,7 +23,16 @@ public abstract class ActifMobile implements Deplacable, Rechargeable, Communica
     private EtatOperationnel etat;
     private Point3D target; // Individual target for movement
     private java.util.List<Point3D> currentPath; // Path to follow
+    private double radius = 5.0; // Default collision radius
 
+    /**
+     * Constructor for ActifMobile.
+     * 
+     * @param id           Unique identifier.
+     * @param position     Initial position.
+     * @param vitesseMax   Maximum speed.
+     * @param autonomieMax Maximum autonomy.
+     */
     public ActifMobile(String id, Point3D position, double vitesseMax, double autonomieMax) {
         this.id = id;
         this.position = position;
@@ -23,6 +43,17 @@ public abstract class ActifMobile implements Deplacable, Rechargeable, Communica
         this.target = null; // No target initially
         this.currentPath = new java.util.ArrayList<>();
     }
+
+    @Override
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    // ... (rest of the class)
 
     public Point3D getTarget() {
         return target;
@@ -88,37 +119,34 @@ public abstract class ActifMobile implements Deplacable, Rechargeable, Communica
             return;
         }
         System.out.println(id + " démarre.");
-        // Logic to change state if needed, e.g. ready for mission
     }
 
     @Override
-    public void eteindre() {
-        System.out.println(id + " s'éteint.");
+    public void arreter() {
+        System.out.println(id + " s'arrête.");
         this.etat = EtatOperationnel.AU_SOL;
     }
 
     @Override
-    public void notifierEtatCritique(TypeAlerte typeAlerte) {
-        // System.out.println("ALERTE [" + id + "]: " + typeAlerte);
-        // Logic to handle alert
+    public void notifierEtatCritique(TypeAlerte type) {
+        System.out.println("ALERTE [" + id + "]: " + type);
     }
 
     @Override
-    public void transmettreAlerte(String message, ActifMobile actifCible) {
-        System.out.println("Transmission de " + id + " à " + (actifCible != null ? actifCible.getId() : "Broadcast")
-                + ": " + message);
+    public void envoyerMessage(String destinataire, String message) {
+        System.out.println("Transmission de " + id + " à " + destinataire + ": " + message);
     }
 
     @Override
-    public void recharger() {
-        this.autonomieActuelle = this.autonomieMax;
-        System.out.println(id + " rechargé.");
+    public void recharger(double quantite) {
+        this.autonomieActuelle = Math.min(this.autonomieMax, this.autonomieActuelle + quantite);
+        System.out.println(id + " rechargé de " + quantite + ". Niveau: " + this.autonomieActuelle);
     }
 
     @Override
     public void ravitailler() {
         this.autonomieActuelle = this.autonomieMax;
-        System.out.println(id + " ravitaillé.");
+        System.out.println(id + " ravitaillé complètement.");
     }
 
     // Abstract methods for movement to be implemented by subclasses
@@ -126,5 +154,5 @@ public abstract class ActifMobile implements Deplacable, Rechargeable, Communica
     public abstract void deplacer(Point3D cible, ZoneOperation zone);
 
     @Override
-    public abstract List<Point3D> calculerTrajet(Point3D cible);
+    public abstract java.util.List<Point3D> calculerTrajet(Point3D cible);
 }

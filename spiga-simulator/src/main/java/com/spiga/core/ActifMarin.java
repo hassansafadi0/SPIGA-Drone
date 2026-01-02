@@ -4,12 +4,32 @@ import com.spiga.env.ZoneOperation;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstract class representing a marine mobile asset.
+ * Extends ActifMobile to provide specific behavior for water-based vehicles.
+ */
 public abstract class ActifMarin extends ActifMobile {
 
+    /**
+     * Constructor for ActifMarin.
+     * 
+     * @param id           Unique identifier of the asset.
+     * @param position     Initial 3D position.
+     * @param vitesseMax   Maximum speed of the asset.
+     * @param autonomieMax Maximum autonomy (fuel/battery).
+     */
     public ActifMarin(String id, Point3D position, double vitesseMax, double autonomieMax) {
         super(id, position, vitesseMax, autonomieMax);
     }
 
+    /**
+     * Moves the marine asset towards a target coordinate.
+     * Considers ocean currents for movement and energy consumption.
+     * Uses pathfinding to navigate around land obstacles.
+     * 
+     * @param cible The target 3D point.
+     * @param zone  The simulation zone containing environmental data and obstacles.
+     */
     @Override
     public void deplacer(Point3D cible, ZoneOperation zone) {
         if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() <= 0) {
@@ -79,7 +99,7 @@ public abstract class ActifMarin extends ActifMobile {
             // System.out.println(getId() + " : Sortie de zone !");
             return;
         }
-        if (zone.isCollision(newPos)) {
+        if (zone.isCollision(newPos, this)) {
             // System.out.println(getId() + " : Collision !");
             notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);
             return;

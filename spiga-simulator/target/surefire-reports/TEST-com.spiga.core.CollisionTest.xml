@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.spiga.core.ActifAerienTest" time="0.021" tests="2" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.spiga.core.CollisionTest" time="0.025" tests="2" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -12,8 +12,9 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-17-openjdk/lib"/>
-    <property name="sun.java.command" value="/home/LouiZz/Documents/javadrone/spiga-simulator/target/surefire/surefirebooter-20260102164847335_3.jar /home/LouiZz/Documents/javadrone/spiga-simulator/target/surefire 2026-01-02T16-48-47_278-jvmRun1 surefire-20260102164847335_1tmp surefire_0-20260102164847335_2tmp"/>
+    <property name="sun.java.command" value="/home/LouiZz/Documents/javadrone/spiga-simulator/target/surefire/surefirebooter-20260102165026000_3.jar /home/LouiZz/Documents/javadrone/spiga-simulator/target/surefire 2026-01-02T16-50-25_963-jvmRun1 surefire-20260102165026000_1tmp surefire_0-20260102165026000_2tmp"/>
     <property name="jdk.debug" value="release"/>
+    <property name="test" value="CollisionTest"/>
     <property name="surefire.test.class.path" value="/home/LouiZz/Documents/javadrone/spiga-simulator/target/test-classes:/home/LouiZz/Documents/javadrone/spiga-simulator/target/classes:/home/LouiZz/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/LouiZz/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/LouiZz/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/LouiZz/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/LouiZz/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/LouiZz/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-controls/17.0.8/javafx-controls-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-controls/17.0.8/javafx-controls-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-graphics/17.0.8/javafx-graphics-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-graphics/17.0.8/javafx-graphics-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-base/17.0.8/javafx-base-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-base/17.0.8/javafx-base-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-fxml/17.0.8/javafx-fxml-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-fxml/17.0.8/javafx-fxml-17.0.8-linux.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="/home/LouiZz"/>
@@ -27,7 +28,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="/home/LouiZz/Documents/javadrone/spiga-simulator/target/surefire/surefirebooter-20260102164847335_3.jar"/>
+    <property name="surefire.real.class.path" value="/home/LouiZz/Documents/javadrone/spiga-simulator/target/surefire/surefirebooter-20260102165026000_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.17+10"/>
     <property name="user.name" value="LouiZz"/>
@@ -52,9 +53,28 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testConsumption" classname="com.spiga.core.ActifAerienTest" time="0.009"/>
-  <testcase name="testDeplacement" classname="com.spiga.core.ActifAerienTest" time="0.002">
-    <system-out><![CDATA[D1 : Décollage immédiat.
+  <testcase name="testCollisionDetection" classname="com.spiga.core.CollisionTest" time="0.014">
+    <system-out><![CDATA[ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
+ALERTE RECONNAISSANCE D2: COLLISION_IMMINENTE
 ]]></system-out>
   </testcase>
+  <testcase name="testNoCollisionDifferentZ" classname="com.spiga.core.CollisionTest" time="0.001"/>
 </testsuite>

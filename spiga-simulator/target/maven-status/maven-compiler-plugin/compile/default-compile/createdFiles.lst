@@ -13,6 +13,7 @@ com/spiga/core/Rechargeable.class
 com/spiga/ui/SimulationView.class
 com/spiga/ui/Dashboard.class
 com/spiga/core/Communicable.class
+com/spiga/env/Collidable.class
 com/spiga/core/VehiculeTerrestre.class
 com/spiga/core/DroneLogistique.class
 com/spiga/core/Deplacable.class

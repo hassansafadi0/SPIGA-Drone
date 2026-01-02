@@ -23,14 +23,29 @@ public class MainApp extends Application {
         zone = new ZoneOperation(new Point3D(0, 0, -1000), new Point3D(1000, 1000, 1000));
 
         // Add sample assets
+        // Add sample assets
         // Drones (Air)
-        gestionnaire.ajouterActif(new com.spiga.core.DroneReconnaissance("D1", new Point3D(100, 100, 50)));
-        gestionnaire.ajouterActif(new com.spiga.core.DroneLogistique("D2", new Point3D(200, 200, 50)));
+        com.spiga.core.ActifMobile d1 = new com.spiga.core.DroneReconnaissance("D1", new Point3D(100, 100, 50));
+        gestionnaire.ajouterActif(d1);
+        zone.addCollidable(d1);
+
+        com.spiga.core.ActifMobile d2 = new com.spiga.core.DroneLogistique("D2", new Point3D(200, 200, 50));
+        gestionnaire.ajouterActif(d2);
+        zone.addCollidable(d2);
+
         // Marine (Water) - Avoid Islands (300,300) and (700,700)
-        gestionnaire.ajouterActif(new com.spiga.core.VehiculeSurface("S1", new Point3D(100, 800, 0)));
-        gestionnaire.ajouterActif(new com.spiga.core.VehiculeSousMarin("U1", new Point3D(800, 100, -50)));
+        com.spiga.core.ActifMobile s1 = new com.spiga.core.VehiculeSurface("S1", new Point3D(100, 800, 0));
+        gestionnaire.ajouterActif(s1);
+        zone.addCollidable(s1);
+
+        com.spiga.core.ActifMobile u1 = new com.spiga.core.VehiculeSousMarin("U1", new Point3D(800, 100, -50));
+        gestionnaire.ajouterActif(u1);
+        zone.addCollidable(u1);
+
         // Land (Islands) - Island 1 is at (300,300)
-        gestionnaire.ajouterActif(new com.spiga.core.VehiculeTerrestre("C1", new Point3D(300, 300, 0)));
+        com.spiga.core.ActifMobile c1 = new com.spiga.core.VehiculeTerrestre("C1", new Point3D(300, 300, 0));
+        gestionnaire.ajouterActif(c1);
+        zone.addCollidable(c1);
 
         // Initialize UI Components
         simulationView = new SimulationView(zone, gestionnaire);
@@ -92,6 +107,7 @@ public class MainApp extends Application {
 
             if (asset != null) {
                 gestionnaire.ajouterActif(asset);
+                zone.addCollidable(asset); // Register for collision detection
                 dashboard.update(); // Immediate update
                 System.out.println("Added asset: " + id);
             }
@@ -110,6 +126,11 @@ public class MainApp extends Application {
         simulationView.startSimulation();
     }
 
+    /**
+     * Main entry point for the application.
+     * 
+     * @param args Command line arguments.
+     */
     public static void main(String[] args) {
         launch(args);
     }

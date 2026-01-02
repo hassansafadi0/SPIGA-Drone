@@ -4,8 +4,18 @@ import com.spiga.env.ZoneOperation;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class representing a land-based vehicle.
+ * Restricted to ground movement (Z=0) and land terrain.
+ */
 public class VehiculeTerrestre extends ActifMobile {
 
+    /**
+     * Constructor for VehiculeTerrestre.
+     * 
+     * @param id       Unique identifier.
+     * @param position Initial position (Z will be forced to 0).
+     */
     public VehiculeTerrestre(String id, Point3D position) {
         super(id, position, 50.0, 120.0); // Medium speed, good autonomy
         // Force Z to be 0 (ground)
@@ -18,6 +28,44 @@ public class VehiculeTerrestre extends ActifMobile {
         super.setPosition(new Point3D(position.getX(), position.getY(), 0));
     }
 
+    @Override
+    public void envoyerMessage(String destinataire, String message) {
+        System.out.println(getId() + " (Terrestre) envoie à " + destinataire + ": " + message);
+    }
+
+    @Override
+    public void demarrer() {
+        System.out.println(getId() + " : Moteur démarré.");
+    }
+
+    @Override
+    public void arreter() {
+        System.out.println(getId() + " : Moteur arrêté.");
+    }
+
+    @Override
+    public void recharger(double quantite) {
+        setAutonomieActuelle(Math.min(getAutonomieMax(), getAutonomieActuelle() + quantite));
+        System.out.println(getId() + " : Plein fait. Niveau: " + getAutonomieActuelle());
+    }
+
+    @Override
+    public void ravitailler() {
+        recharger(100);
+    }
+
+    @Override
+    public void notifierEtatCritique(TypeAlerte type) {
+        System.out.println("ALERTE TERRESTRE " + getId() + ": " + type);
+    }
+
+    /**
+     * Moves the land vehicle towards a target.
+     * Enforces land-only movement and uses pathfinding.
+     * 
+     * @param cible The target point.
+     * @param zone  The simulation zone.
+     */
     @Override
     public void deplacer(Point3D cible, ZoneOperation zone) {
         if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() <= 0) {
@@ -77,7 +125,7 @@ public class VehiculeTerrestre extends ActifMobile {
         if (!zone.isInside(newPos)) {
             return;
         }
-        if (zone.isCollision(newPos)) {
+        if (zone.isCollision(newPos, this)) {
             notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);
             return;
         }

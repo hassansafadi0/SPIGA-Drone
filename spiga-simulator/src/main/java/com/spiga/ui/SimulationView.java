@@ -49,62 +49,22 @@ public class SimulationView extends Pane {
         });
     }
 
-    private boolean handleSelection(double mx, double my) {
-        for (ActifMobile actif : gestionnaire.getFlotte()) {
-            // Map world to canvas
-            double x = actif.getPosition().getX() * SCALE;
-            double y = actif.getPosition().getY() * SCALE;
-
-            // Simple hit detection (radius 20 for easier clicking)
-            if (Math.abs(mx - x) < 20 && Math.abs(my - y) < 20) {
-                selectedAsset = actif;
-                System.out.println("Selected: " + actif.getId());
-                draw();
-                return true;
-            }
-        }
-        // If clicked empty space, deselect? Or keep selected?
-        // Let's keep selected to allow moving. To deselect, maybe click outside or
-        // specific key.
-        // For now, return false so we can trigger move.
-        return false;
-    }
-
-    private void handleMoveCommand(double mx, double my) {
-        if (selectedAsset == null)
-            return;
-
-        // Map canvas back to world
-        double wx = mx / SCALE;
-        double wy = my / SCALE;
-        double wz = selectedAsset.getPosition().getZ(); // Keep current altitude/depth by default
-
-        // Constraints
-        String type = selectedAsset.getClass().getSimpleName();
-        Point3D target = new Point3D(wx, wy, wz);
-        boolean isLand = zone.isLand(target);
-
-        if (type.contains("VehiculeTerrestre") && !isLand) {
-            System.out.println("Cannot move Car to Sea!");
-            return;
-        }
-        if ((type.contains("Surface") || type.contains("SousMarin")) && isLand) {
-            System.out.println("Cannot move Marine asset to Land!");
-            return;
-        }
-
-        selectedAsset.setTarget(target);
-        System.out.println("Moving " + selectedAsset.getId() + " to " + wx + ", " + wy);
-    }
-
     private Runnable onUpdate;
 
+    /**
+     * Sets the callback to be run on every simulation update.
+     * 
+     * @param onUpdate The runnable to execute.
+     */
     public void setOnUpdate(Runnable onUpdate) {
         this.onUpdate = onUpdate;
     }
 
     private long lastUpdate = 0;
 
+    /**
+     * Starts the simulation animation timer.
+     */
     public void startSimulation() {
         timer = new AnimationTimer() {
             @Override
@@ -122,6 +82,65 @@ public class SimulationView extends Pane {
         timer.start();
     }
 
+    private boolean handleSelection(double mx, double my) {
+        boolean clickedOnAsset = false;
+        for (ActifMobile actif : gestionnaire.getFlotte()) {
+            // Map world to canvas
+            double x = actif.getPosition().getX() * SCALE;
+            double y = actif.getPosition().getY() * SCALE;
+
+            // Simple hit detection (radius 20 for easier clicking)
+            if (Math.abs(mx - x) < 20 && Math.abs(my - y) < 20) {
+                selectedAsset = actif;
+                System.out.println("Selected: " + actif.getId());
+                draw();
+                clickedOnAsset = true;
+                break;
+            }
+        }
+        return clickedOnAsset;
+    }
+
+    /**
+     * Handles the movement command for the selected asset.
+     * Validates the target position based on terrain constraints.
+     * 
+     * @param mx Mouse X coordinate.
+     * @param my Mouse Y coordinate.
+     */
+    private void handleMoveCommand(double mx, double my) {
+        if (selectedAsset == null)
+            return;
+
+        // Map canvas back to world
+        double wx = mx / SCALE;
+        double wy = my / SCALE;
+        double wz = selectedAsset.getPosition().getZ(); // Keep current altitude/depth by default
+
+        // Constraints
+        // 1. Marine assets cannot go on land
+        if (selectedAsset instanceof com.spiga.core.ActifMarin) {
+            if (zone.isLand(new Point3D(wx, wy, 0))) {
+                System.out.println("Cannot move marine asset to land!");
+                return;
+            }
+        }
+        // 2. Land vehicles cannot go into water
+        if (selectedAsset instanceof com.spiga.core.VehiculeTerrestre) {
+            if (!zone.isLand(new Point3D(wx, wy, 0))) {
+                System.out.println("Cannot move land vehicle to water!");
+                return;
+            }
+        }
+
+        selectedAsset.setTarget(new Point3D(wx, wy, wz));
+        System.out.println("Moving " + selectedAsset.getId() + " to " + wx + ", " + wy);
+    }
+
+    /**
+     * Updates the state of all assets.
+     * Moves assets towards their targets and checks for arrival.
+     */
     private void update() {
         for (ActifMobile actif : gestionnaire.getFlotte()) {
             if (actif.getTarget() != null) {
@@ -130,7 +149,7 @@ public class SimulationView extends Pane {
                 // Stop if reached (simple check)
                 double dx = actif.getTarget().getX() - actif.getPosition().getX();
                 double dy = actif.getTarget().getY() - actif.getPosition().getY();
-                if (Math.sqrt(dx * dx + dy * dy) < 2.0) { // Increased tolerance
+                if (Math.sqrt(dx * dx + dy * dy) < 5.0) { // Tolerance
                     actif.setTarget(null); // Stop
                     actif.setEtat(com.spiga.core.EtatOperationnel.AU_SOL); // Reset state
                 }
@@ -138,45 +157,27 @@ public class SimulationView extends Pane {
         }
     }
 
+    /**
+     * Draws the simulation state on the canvas.
+     * Renders the map (water, islands) and assets.
+     */
     private void draw() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Draw Terrain (Water Background)
+        // Clear background (Water)
         gc.setFill(Color.LIGHTBLUE);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // Draw Islands
         gc.setFill(Color.LIGHTGREEN);
-        for (com.spiga.env.ZoneOperation.Island island : zone.getIslands()) {
+        for (ZoneOperation.Island island : zone.getIslands()) {
             if (island.isCircle) {
-                double r = island.w; // radius
-                double x = (island.x - r) * SCALE;
-                double y = (island.y - r) * SCALE;
-                double d = r * 2 * SCALE;
-                gc.fillOval(x, y, d, d);
+                gc.fillOval(island.x * SCALE - (island.w * SCALE), island.y * SCALE - (island.w * SCALE),
+                        island.w * SCALE * 2, island.w * SCALE * 2);
             } else {
-                double w = island.w * SCALE;
-                double h = island.h * SCALE;
-                double x = (island.x - island.w / 2) * SCALE;
-                double y = (island.y - island.h / 2) * SCALE;
-                gc.fillRect(x, y, w, h);
+                gc.fillRect(island.x * SCALE, island.y * SCALE, island.w * SCALE, island.h * SCALE);
             }
         }
-
-        // Grid lines
-        gc.setStroke(Color.GRAY);
-        gc.setLineWidth(0.5);
-        for (int i = 0; i <= 1000; i += 100) {
-            double pos = i * SCALE;
-            gc.strokeLine(pos, 0, pos, 900);
-            gc.strokeLine(0, pos, 900, pos);
-        }
-
-        // Draw Zone Boundary
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(2.0);
-        gc.strokeRect(0, 0, 1000 * SCALE, 1000 * SCALE);
 
         // Draw Assets
         for (ActifMobile actif : gestionnaire.getFlotte()) {
@@ -185,14 +186,12 @@ public class SimulationView extends Pane {
     }
 
     private void drawAsset(GraphicsContext gc, ActifMobile actif) {
-        // Map world coordinates to canvas coordinates
         double x = actif.getPosition().getX() * SCALE;
         double y = actif.getPosition().getY() * SCALE;
-
         String type = actif.getClass().getSimpleName();
+
         gc.setFill(getColorForType(actif));
 
-        // Selection Highlight
         if (actif == selectedAsset) {
             gc.setStroke(Color.RED);
             gc.setLineWidth(2);

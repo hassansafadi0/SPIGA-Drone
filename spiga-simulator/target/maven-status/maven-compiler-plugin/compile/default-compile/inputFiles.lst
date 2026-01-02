@@ -14,6 +14,7 @@
 /home/LouiZz/Documents/javadrone/spiga-simulator/src/main/java/com/spiga/core/VehiculeSousMarin.java
 /home/LouiZz/Documents/javadrone/spiga-simulator/src/main/java/com/spiga/core/VehiculeSurface.java
 /home/LouiZz/Documents/javadrone/spiga-simulator/src/main/java/com/spiga/core/VehiculeTerrestre.java
+/home/LouiZz/Documents/javadrone/spiga-simulator/src/main/java/com/spiga/env/Collidable.java
 /home/LouiZz/Documents/javadrone/spiga-simulator/src/main/java/com/spiga/env/Obstacle.java
 /home/LouiZz/Documents/javadrone/spiga-simulator/src/main/java/com/spiga/env/ZoneOperation.java
 /home/LouiZz/Documents/javadrone/spiga-simulator/src/main/java/com/spiga/mission/GestionnaireEssaim.java

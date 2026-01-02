@@ -14,6 +14,8 @@ public class ZoneOperation {
     private List<Island> islands;
     private static final int GRID_SIZE = 50; // 50x50 grid for 1000x1000 world (20 units per cell)
 
+    private List<Collidable> collidables;
+
     public ZoneOperation(Point3D minCoord, Point3D maxCoord) {
         this.minCoord = minCoord;
         this.maxCoord = maxCoord;
@@ -22,6 +24,7 @@ public class ZoneOperation {
         this.courantMarin = new Point3D(0, 0, 0);
         this.obstacles = new ArrayList<>();
         this.islands = new ArrayList<>();
+        this.collidables = new ArrayList<>();
 
         // Define Islands
         // Island 1: Circle at (300, 300), Radius 150
@@ -30,10 +33,30 @@ public class ZoneOperation {
         islands.add(new Island(700, 700, 200, 300, false));
     }
 
+    /**
+     * Nested class representing an island obstacle.
+     */
     public static class Island {
-        public double x, y, w, h;
-        public boolean isCircle; // true = circle (w=radius), false = rectangle
+        /** X coordinate of the island center/top-left. */
+        public double x;
+        /** Y coordinate of the island center/top-left. */
+        public double y;
+        /** Width or radius of the island. */
+        public double w;
+        /** Height of the island (if not circular). */
+        public double h;
+        /** True if the island is circular, false if rectangular. */
+        public boolean isCircle;
 
+        /**
+         * Constructor for Island.
+         * 
+         * @param x        X coordinate.
+         * @param y        Y coordinate.
+         * @param w        Width or radius.
+         * @param h        Height.
+         * @param isCircle Shape type.
+         */
         public Island(double x, double y, double w, double h, boolean isCircle) {
             this.x = x;
             this.y = y;
@@ -52,6 +75,11 @@ public class ZoneOperation {
         }
     }
 
+    /**
+     * Gets the list of islands in the zone.
+     * 
+     * @return List of islands.
+     */
     public List<Island> getIslands() {
         return islands;
     }
@@ -92,10 +120,43 @@ public class ZoneOperation {
         this.obstacles.add(obstacle);
     }
 
+    public void addCollidable(Collidable c) {
+        this.collidables.add(c);
+    }
+
+    public void removeCollidable(Collidable c) {
+        this.collidables.remove(c);
+    }
+
     public boolean isCollision(Point3D point) {
+        return isCollision(point, null);
+    }
+
+    public boolean isCollision(Point3D point, Collidable ignoreMe) {
+        // Check static obstacles
         for (Obstacle obs : obstacles) {
             if (obs.contains(point)) {
                 return true;
+            }
+        }
+
+        // Check dynamic collidables (vehicles)
+        for (Collidable c : collidables) {
+            if (c == ignoreMe)
+                continue;
+
+            // Check if at same Z level (with small tolerance)
+            if (Math.abs(c.getPosition().getZ() - point.getZ()) < 0.1) {
+                double dist = Math.sqrt(
+                        Math.pow(c.getPosition().getX() - point.getX(), 2) +
+                                Math.pow(c.getPosition().getY() - point.getY(), 2));
+
+                // Assume default radius for the point being checked if not provided
+                double myRadius = (ignoreMe != null) ? ignoreMe.getRadius() : 5.0;
+
+                if (dist < (c.getRadius() + myRadius)) {
+                    return true;
+                }
             }
         }
         return false;

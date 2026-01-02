@@ -17,10 +17,18 @@ public abstract class Mission {
         this.actifsAssignes = new ArrayList<>();
     }
 
+    /**
+     * Assigns an asset to the mission.
+     * 
+     * @param actif The mobile asset to assign.
+     */
     public void assignerActif(ActifMobile actif) {
         this.actifsAssignes.add(actif);
     }
 
+    /**
+     * Starts the mission.
+     */
     public void demarrer() {
         this.statut = StatutMission.EN_COURS;
         for (ActifMobile actif : actifsAssignes) {
@@ -29,14 +37,22 @@ public abstract class Mission {
         System.out.println("Mission " + id + " démarrée.");
     }
 
+    /**
+     * Terminates the mission.
+     */
     public void terminer() {
         this.statut = StatutMission.TERMINEE;
         for (ActifMobile actif : actifsAssignes) {
-            actif.eteindre(); // Or return to base
+            actif.arreter(); // Or return to base
         }
         System.out.println("Mission " + id + " terminée.");
     }
 
+    /**
+     * Returns the current status of the mission.
+     * 
+     * @return The status of the mission.
+     */
     public StatutMission getStatut() {
         return statut;
     }

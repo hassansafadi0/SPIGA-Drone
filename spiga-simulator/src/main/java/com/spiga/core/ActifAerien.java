@@ -4,12 +4,31 @@ import com.spiga.env.ZoneOperation;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstract class representing an aerial mobile asset.
+ * Extends ActifMobile to provide specific behavior for flying vehicles.
+ */
 public abstract class ActifAerien extends ActifMobile {
 
+    /**
+     * Constructor for ActifAerien.
+     * 
+     * @param id           Unique identifier of the asset.
+     * @param position     Initial 3D position.
+     * @param vitesseMax   Maximum speed of the asset.
+     * @param autonomieMax Maximum autonomy (fuel/battery).
+     */
     public ActifAerien(String id, Point3D position, double vitesseMax, double autonomieMax) {
         super(id, position, vitesseMax, autonomieMax);
     }
 
+    /**
+     * Moves the aerial asset towards a target coordinate.
+     * Considers wind effects and precipitation for energy consumption.
+     * 
+     * @param cible The target 3D point.
+     * @param zone  The simulation zone containing environmental data.
+     */
     @Override
     public void deplacer(Point3D cible, ZoneOperation zone) {
         if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() <= 0) {
@@ -69,7 +88,7 @@ public abstract class ActifAerien extends ActifMobile {
             // System.out.println(getId() + " : Sortie de zone !");
             return;
         }
-        if (zone.isCollision(newPos)) {
+        if (zone.isCollision(newPos, this)) {
             // System.out.println(getId() + " : Collision détectée !");
             notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);
             return;

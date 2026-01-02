@@ -1,46 +1,65 @@
 package com.spiga.ui;
 
 import com.spiga.core.*;
+import com.spiga.mission.GestionnaireEssaim;
+import com.spiga.mission.Mission;
+import com.spiga.mission.MissionReconnaissance;
 import com.spiga.env.ZoneOperation;
-import com.spiga.mission.*;
 import java.util.Scanner;
 
+/**
+ * Console-based interface for the simulation.
+ * Provides a text-based menu to interact with the fleet manager.
+ */
 public class ConsoleInterface {
     private GestionnaireEssaim gestionnaire;
-    private ZoneOperation zone;
     private Scanner scanner;
+    private ZoneOperation zone;
 
-    public ConsoleInterface() {
-        this.gestionnaire = new GestionnaireEssaim();
-        // Default zone 1000x1000x1000
-        this.zone = new ZoneOperation(new Point3D(0, 0, 0), new Point3D(1000, 1000, 1000));
+    /**
+     * Constructor for ConsoleInterface.
+     * 
+     * @param gestionnaire The fleet manager.
+     */
+    public ConsoleInterface(GestionnaireEssaim gestionnaire) {
+        this.gestionnaire = gestionnaire;
         this.scanner = new Scanner(System.in);
+        // Initialize persistent zone
+        this.zone = new ZoneOperation(new Point3D(0, 0, -1000), new Point3D(1000, 1000, 1000));
     }
 
-    public void start() {
+    /**
+     * Starts the console interface loop.
+     * Displays a menu and processes user input.
+     */
+    /**
+     * Starts the console interface loop.
+     * Displays a menu and processes user input.
+     */
+    public void demarrer() {
         boolean running = true;
         while (running) {
-            System.out.println("\n--- SPIGA CLI ---");
-            System.out.println("1. Créer un actif");
-            System.out.println("2. Lister les actifs");
+            System.out.println("\n--- SPIGA Simulator Console ---");
+            System.out.println("1. Ajouter un actif");
+            System.out.println("2. Lister la flotte");
             System.out.println("3. Créer une mission");
             System.out.println("4. Simuler un pas de temps");
             System.out.println("5. Quitter");
             System.out.print("Choix: ");
 
-            String choice = scanner.nextLine();
-            switch (choice) {
+            String choix = scanner.nextLine();
+            switch (choix) {
                 case "1":
-                    createAsset();
+                    ajouterActif();
                     break;
                 case "2":
-                    listAssets();
+                    listerFlotte();
                     break;
                 case "3":
-                    createMission();
+                    creerMission();
                     break;
                 case "4":
-                    simulateStep();
+                    simulerPasDeTemps();
                     break;
                 case "5":
                     running = false;
@@ -51,74 +70,102 @@ public class ConsoleInterface {
         }
     }
 
-    private void createAsset() {
-        System.out.println(
-                "Type d'actif (1: DroneReconnaissance, 2: DroneLogistique, 3: VehiculeSurface, 4: VehiculeSousMarin): ");
-        String type = scanner.nextLine();
+    /**
+     * Prompts the user to add a new asset.
+     */
+    private void ajouterActif() {
         System.out.print("ID: ");
         String id = scanner.nextLine();
+        System.out.println("Type (1: Recon, 2: Logistique, 3: Surface, 4: Sous-marin, 5: Terrestre): ");
+        String type = scanner.nextLine();
 
         ActifMobile actif = null;
-        Point3D startPos = new Point3D(0, 0, 0); // Default start
 
         switch (type) {
             case "1":
-                actif = new DroneReconnaissance(id, startPos);
+                actif = new DroneReconnaissance(id, new Point3D(0, 0, 50));
                 break;
             case "2":
-                actif = new DroneLogistique(id, startPos);
+                actif = new DroneLogistique(id, new Point3D(0, 0, 10));
                 break;
             case "3":
-                actif = new VehiculeSurface(id, startPos);
+                actif = new VehiculeSurface(id, new Point3D(0, 0, 0));
                 break;
             case "4":
-                actif = new VehiculeSousMarin(id, startPos);
+                actif = new VehiculeSousMarin(id, new Point3D(0, 0, -50));
+                break;
+            case "5":
+                actif = new VehiculeTerrestre(id, new Point3D(0, 0, 0));
                 break;
             default:
                 System.out.println("Type inconnu.");
                 return;
         }
 
-        gestionnaire.ajouterActif(actif);
-        System.out.println("Actif créé.");
-    }
-
-    private void listAssets() {
-        for (ActifMobile a : gestionnaire.getFlotte()) {
-            System.out.println(a.getId() + " [" + a.getClass().getSimpleName() + "] - " + a.getEtat() + " - Pos: "
-                    + a.getPosition());
+        if (actif != null) {
+            gestionnaire.ajouterActif(actif);
+            zone.addCollidable(actif); // Register for collision detection
+            System.out.println("Actif ajouté : " + actif.getId());
         }
     }
 
-    private void createMission() {
+    /**
+     * Lists all assets in the fleet with their status and position.
+     */
+    private void listerFlotte() {
+        System.out.println("\n--- Flotte ---");
+        for (ActifMobile actif : gestionnaire.getFlotte()) {
+            System.out.printf("%s [%s] - %s - Pos: %s%n",
+                    actif.getId(),
+                    actif.getClass().getSimpleName(),
+                    actif.getEtat(),
+                    actif.getPosition());
+        }
+    }
+
+    /**
+     * Creates and assigns a mission to an available asset.
+     */
+    private void creerMission() {
         System.out.print("ID Mission: ");
         String id = scanner.nextLine();
         Mission mission = new MissionReconnaissance(id);
 
-        // Auto assign first available asset for demo
+        // Auto assign first available asset
         ActifMobile asset = gestionnaire.suggererActif(10);
         if (asset != null) {
             mission.assignerActif(asset);
-            mission.demarrer(); // Start immediately for demo
+            mission.demarrer();
+            System.out.println("Mission " + id + " assignée à " + asset.getId() + " et démarrée.");
         } else {
-            System.out.println("Aucun actif disponible.");
+            System.out.println("Aucun actif disponible pour cette mission.");
         }
     }
 
-    private void simulateStep() {
-        // Move all assets in mission
-        // For simplicity, move all assets towards a dummy target (100, 100, 100)
-        Point3D target = new Point3D(100, 100, 100);
-        for (ActifMobile a : gestionnaire.getFlotte()) {
-            if (a.getEtat() == EtatOperationnel.EN_MISSION || a.getEtat() == EtatOperationnel.AU_SOL) { // Allow AU_SOL
-                                                                                                        // to move for
-                                                                                                        // test
-                a.deplacer(target, zone);
+    /**
+     * Simulates a time step by moving assets.
+     */
+    private void simulerPasDeTemps() {
+        System.out.println("Simulation d'un pas de temps...");
+        // Simple simulation: move all assets towards a dummy target
+        Point3D target = new Point3D(100, 100, 50);
+
+        for (ActifMobile actif : gestionnaire.getFlotte()) {
+            if (actif.getEtat() == EtatOperationnel.EN_MISSION || actif.getEtat() == EtatOperationnel.AU_SOL) {
+                actif.deplacer(target, zone);
+                System.out.println(actif.getId() + " déplacé vers " + actif.getPosition());
             }
         }
     }
 
+    /**
+     * Main entry point for the console interface.
+     * 
+     * @param args Command line arguments.
+     */
     public static void main(String[] args) {
-        new ConsoleInterface().start();
+        GestionnaireEssaim gestionnaire = new GestionnaireEssaim();
+        ConsoleInterface console = new ConsoleInterface(gestionnaire);
+        console.demarrer();
     }
 }
