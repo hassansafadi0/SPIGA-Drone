@@ -1,4 +1,11 @@
+com/spiga/core/VehiculeSousMarinTest.class
 com/spiga/core/CollisionTest.class
-com/spiga/mission/GestionnaireEssaimTest.class
+com/spiga/core/ActifMarinTest.class
+com/spiga/mission/MissionTest.class
 com/spiga/env/ZoneOperationTest.class
+com/spiga/core/VehiculeSurfaceTest.class
 com/spiga/core/ActifAerienTest.class
+com/spiga/core/ActifMobileTest.class
+com/spiga/mission/GestionnaireEssaimTest.class
+com/spiga/core/DroneLogistiqueTest.class
+com/spiga/core/VehiculeTerrestreTest.class

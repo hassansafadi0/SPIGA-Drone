@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Obstacle.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.env</a> &gt; <span class="el_source">Obstacle.java</span></div><h1>Obstacle.java</h1><pre class="source lang-java linenums">package com.spiga.env;
+
+import com.spiga.core.Point3D;
+
+public class Obstacle {
+    private Point3D position;
+    private double radius; // Simple spherical obstacle for now
+
+<span class="fc" id="L9">    public Obstacle(Point3D position, double radius) {</span>
+<span class="fc" id="L10">        this.position = position;</span>
+<span class="fc" id="L11">        this.radius = radius;</span>
+<span class="fc" id="L12">    }</span>
+
+    public boolean contains(Point3D point) {
+<span class="fc" id="L15">        double dx = point.getX() - position.getX();</span>
+<span class="fc" id="L16">        double dy = point.getY() - position.getY();</span>
+<span class="fc" id="L17">        double dz = point.getZ() - position.getZ();</span>
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        return (dx * dx + dy * dy + dz * dz) &lt;= (radius * radius);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

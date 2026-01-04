@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Dashboard.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.ui</a> &gt; <span class="el_source">Dashboard.java</span></div><h1>Dashboard.java</h1><pre class="source lang-java linenums">package com.spiga.ui;
+
+import com.spiga.core.ActifMobile;
+import com.spiga.core.Point3D;
+import com.spiga.mission.GestionnaireEssaim;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
+import com.spiga.mission.ObjectifMission;
+import java.util.function.BiConsumer;
+
+public class Dashboard extends VBox {
+    private GestionnaireEssaim gestionnaire;
+    private ListView&lt;String&gt; assetList;
+
+    private ComboBox&lt;String&gt; typeSelect;
+    private TextField idInput;
+    private TextField xInput, yInput, zInput;
+    private AssetCreator assetCreator;
+    private BiConsumer&lt;Point3D, ObjectifMission&gt; onSetTarget;
+
+    /**
+     * Functional interface for creating assets.
+     */
+    public interface AssetCreator {
+        void create(String type, String id, Point3D position);
+    }
+
+    /**
+     * Constructor for Dashboard.
+     * 
+     * @param gestionnaire The fleet manager.
+     */
+    public Dashboard(GestionnaireEssaim gestionnaire) {
+<span class="nc" id="L37">        this(gestionnaire, null);</span>
+<span class="nc" id="L38">    }</span>
+
+    /**
+     * Constructor for Dashboard with asset creator callback.
+     * 
+     * @param gestionnaire The fleet manager.
+     * @param assetCreator Callback for creating assets.
+     */
+<span class="nc" id="L46">    public Dashboard(GestionnaireEssaim gestionnaire, AssetCreator assetCreator) {</span>
+<span class="nc" id="L47">        this.gestionnaire = gestionnaire;</span>
+<span class="nc" id="L48">        this.assetCreator = assetCreator;</span>
+<span class="nc" id="L49">        this.setPadding(new Insets(10));</span>
+<span class="nc" id="L50">        this.setSpacing(10);</span>
+<span class="nc" id="L51">        this.setStyle(&quot;-fx-background-color: #f0f0f0; -fx-border-color: #ccc;&quot;);</span>
+<span class="nc" id="L52">        this.setPrefWidth(300);</span>
+
+        // Title
+<span class="nc" id="L55">        Label title = new Label(&quot;Dashboard&quot;);</span>
+<span class="nc" id="L56">        title.setStyle(&quot;-fx-font-size: 18px; -fx-font-weight: bold;&quot;);</span>
+<span class="nc" id="L57">        this.getChildren().add(title);</span>
+
+        // Asset Creation Section
+<span class="nc" id="L60">        VBox creationBox = new VBox(5);</span>
+<span class="nc" id="L61">        creationBox.setStyle(&quot;-fx-border-color: #aaa; -fx-padding: 5;&quot;);</span>
+<span class="nc" id="L62">        creationBox.getChildren().add(new Label(&quot;Add New Asset:&quot;));</span>
+
+<span class="nc" id="L64">        typeSelect = new ComboBox&lt;&gt;();</span>
+<span class="nc" id="L65">        typeSelect.getItems().addAll(</span>
+                &quot;DroneReconnaissance&quot;,
+                &quot;DroneLogistique&quot;,
+                &quot;VehiculeSurface&quot;,
+                &quot;VehiculeSousMarin&quot;,
+                &quot;VehiculeTerrestre&quot;);
+<span class="nc" id="L71">        typeSelect.getSelectionModel().selectFirst();</span>
+
+<span class="nc" id="L73">        idInput = new TextField();</span>
+<span class="nc" id="L74">        idInput.setPromptText(&quot;ID (e.g. D1)&quot;);</span>
+
+<span class="nc" id="L76">        HBox posBox = new HBox(5);</span>
+<span class="nc" id="L77">        xInput = new TextField(&quot;100&quot;);</span>
+<span class="nc" id="L78">        xInput.setPrefWidth(60);</span>
+<span class="nc" id="L79">        yInput = new TextField(&quot;100&quot;);</span>
+<span class="nc" id="L80">        yInput.setPrefWidth(60);</span>
+<span class="nc" id="L81">        zInput = new TextField(&quot;50&quot;);</span>
+<span class="nc" id="L82">        zInput.setPrefWidth(60);</span>
+<span class="nc" id="L83">        posBox.getChildren().addAll(new Label(&quot;X:&quot;), xInput, new Label(&quot;Y:&quot;), yInput, new Label(&quot;Z:&quot;), zInput);</span>
+
+<span class="nc" id="L85">        Button addButton = new Button(&quot;Add Asset&quot;);</span>
+<span class="nc" id="L86">        addButton.setOnAction(e -&gt; handleAddAsset());</span>
+
+<span class="nc" id="L88">        creationBox.getChildren().addAll(typeSelect, idInput, posBox, addButton);</span>
+<span class="nc" id="L89">        this.getChildren().add(creationBox);</span>
+
+        // Asset List
+<span class="nc" id="L92">        this.getChildren().add(new Label(&quot;Current Assets:&quot;));</span>
+<span class="nc" id="L93">        assetList = new ListView&lt;&gt;();</span>
+<span class="nc" id="L94">        assetList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);</span>
+<span class="nc" id="L95">        update(); // Initial population</span>
+<span class="nc" id="L96">        this.getChildren().add(assetList);</span>
+
+        // Refresh Button
+<span class="nc" id="L99">        Button refreshBtn = new Button(&quot;Refresh List&quot;);</span>
+<span class="nc" id="L100">        refreshBtn.setOnAction(e -&gt; update());</span>
+<span class="nc" id="L101">        this.getChildren().add(refreshBtn);</span>
+
+        // Target Control
+<span class="nc" id="L104">        VBox targetBox = new VBox(5);</span>
+<span class="nc" id="L105">        targetBox.setStyle(&quot;-fx-border-color: #aaa; -fx-padding: 5;&quot;);</span>
+<span class="nc" id="L106">        targetBox.getChildren().add(new Label(&quot;Set Target (All):&quot;));</span>
+
+<span class="nc" id="L108">        HBox targetPosBox = new HBox(5);</span>
+<span class="nc" id="L109">        TextField txInput = new TextField(&quot;500&quot;);</span>
+<span class="nc" id="L110">        txInput.setPrefWidth(60);</span>
+<span class="nc" id="L111">        TextField tyInput = new TextField(&quot;500&quot;);</span>
+<span class="nc" id="L112">        tyInput.setPrefWidth(60);</span>
+<span class="nc" id="L113">        TextField tzInput = new TextField(&quot;0&quot;);</span>
+<span class="nc" id="L114">        tzInput.setPrefWidth(60);</span>
+<span class="nc" id="L115">        targetPosBox.getChildren().addAll(new Label(&quot;X:&quot;), txInput, new Label(&quot;Y:&quot;), tyInput, new Label(&quot;Z:&quot;), tzInput);</span>
+
+<span class="nc" id="L117">        ComboBox&lt;ObjectifMission&gt; missionTypeSelect = new ComboBox&lt;&gt;();</span>
+<span class="nc" id="L118">        missionTypeSelect.getItems().setAll(ObjectifMission.values());</span>
+<span class="nc" id="L119">        missionTypeSelect.getSelectionModel().select(ObjectifMission.RECONNAISSANCE);</span>
+
+<span class="nc" id="L121">        Button setTargetBtn = new Button(&quot;Set Target&quot;);</span>
+<span class="nc" id="L122">        setTargetBtn.setOnAction(e -&gt; {</span>
+            try {
+<span class="nc" id="L124">                double x = Double.parseDouble(txInput.getText());</span>
+<span class="nc" id="L125">                double y = Double.parseDouble(tyInput.getText());</span>
+<span class="nc" id="L126">                double z = Double.parseDouble(tzInput.getText());</span>
+<span class="nc" id="L127">                Point3D target = new Point3D(x, y, z);</span>
+
+                // Check for selection
+<span class="nc" id="L130">                java.util.List&lt;String&gt; selectedItems = assetList.getSelectionModel().getSelectedItems();</span>
+
+<span class="nc bnc" id="L132" title="All 2 branches missed.">                if (!selectedItems.isEmpty()) {</span>
+                    // Group Mission Logic (Selected Assets)
+<span class="nc" id="L134">                    java.util.List&lt;String&gt; selectedIds = new java.util.ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">                    for (String item : selectedItems) {</span>
+<span class="nc bnc" id="L136" title="All 4 branches missed.">                        if (item != null &amp;&amp; !item.isEmpty()) {</span>
+<span class="nc" id="L137">                            selectedIds.add(item.split(&quot; &quot;)[0]);</span>
+                        }
+<span class="nc" id="L139">                    }</span>
+
+<span class="nc bnc" id="L141" title="All 2 branches missed.">                    if (onCreateGroupMission != null) {</span>
+<span class="nc" id="L142">                        onCreateGroupMission.accept(selectedIds, target);</span>
+                    }
+<span class="nc" id="L144">                } else {</span>
+                    // Global Logic (All Assets)
+<span class="nc bnc" id="L146" title="All 2 branches missed.">                    if (onSetTarget != null) {</span>
+<span class="nc" id="L147">                        onSetTarget.accept(target, missionTypeSelect.getValue());</span>
+                    }
+                }
+<span class="nc" id="L150">            } catch (NumberFormatException ex) {</span>
+<span class="nc" id="L151">                showAlert(&quot;Invalid target coordinates!&quot;);</span>
+<span class="nc" id="L152">            }</span>
+<span class="nc" id="L153">        });</span>
+
+<span class="nc" id="L155">        targetBox.getChildren().addAll(targetPosBox, missionTypeSelect, setTargetBtn);</span>
+<span class="nc" id="L156">        this.getChildren().add(targetBox);</span>
+<span class="nc" id="L157">    }</span>
+
+    private BiConsumer&lt;java.util.List&lt;String&gt;, Point3D&gt; onCreateGroupMission;
+
+    public void setOnCreateGroupMission(BiConsumer&lt;java.util.List&lt;String&gt;, Point3D&gt; callback) {
+<span class="nc" id="L162">        this.onCreateGroupMission = callback;</span>
+<span class="nc" id="L163">    }</span>
+
+    /**
+     * Sets the asset creator callback.
+     * 
+     * @param creator The callback.
+     */
+    public void setAssetCreator(AssetCreator creator) {
+<span class="nc" id="L171">        this.assetCreator = creator;</span>
+<span class="nc" id="L172">    }</span>
+
+    /**
+     * Sets the callback for setting a target.
+     * 
+     * @param onSetTarget The callback.
+     */
+    public void setOnSetTarget(BiConsumer&lt;Point3D, ObjectifMission&gt; onSetTarget) {
+<span class="nc" id="L180">        this.onSetTarget = onSetTarget;</span>
+<span class="nc" id="L181">    }</span>
+
+    /**
+     * Handles the &quot;Add Asset&quot; button click.
+     */
+    private void handleAddAsset() {
+<span class="nc bnc" id="L187" title="All 2 branches missed.">        if (assetCreator != null) {</span>
+            try {
+<span class="nc" id="L189">                String type = typeSelect.getValue();</span>
+<span class="nc" id="L190">                String id = idInput.getText();</span>
+<span class="nc" id="L191">                double x = Double.parseDouble(xInput.getText());</span>
+<span class="nc" id="L192">                double y = Double.parseDouble(yInput.getText());</span>
+<span class="nc" id="L193">                double z = Double.parseDouble(zInput.getText());</span>
+
+<span class="nc bnc" id="L195" title="All 2 branches missed.">                if (id.isEmpty()) {</span>
+<span class="nc" id="L196">                    showAlert(&quot;ID is required!&quot;);</span>
+<span class="nc" id="L197">                    return;</span>
+                }
+
+<span class="nc" id="L200">                assetCreator.create(type, id, new Point3D(x, y, z));</span>
+<span class="nc" id="L201">                idInput.clear(); // Reset ID for next</span>
+<span class="nc" id="L202">            } catch (NumberFormatException ex) {</span>
+<span class="nc" id="L203">                showAlert(&quot;Invalid coordinates!&quot;);</span>
+<span class="nc" id="L204">            }</span>
+        }
+<span class="nc" id="L206">    }</span>
+
+    /**
+     * Updates the asset list view.
+     */
+    public void update() {
+        // Store current selection
+<span class="nc" id="L213">        java.util.List&lt;String&gt; selectedItems = new java.util.ArrayList&lt;&gt;(</span>
+<span class="nc" id="L214">                assetList.getSelectionModel().getSelectedItems());</span>
+<span class="nc" id="L215">        java.util.List&lt;String&gt; selectedIds = new java.util.ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">        for (String item : selectedItems) {</span>
+<span class="nc bnc" id="L217" title="All 4 branches missed.">            if (item != null &amp;&amp; !item.isEmpty()) {</span>
+<span class="nc" id="L218">                selectedIds.add(item.split(&quot; &quot;)[0]);</span>
+            }
+<span class="nc" id="L220">        }</span>
+
+<span class="nc" id="L222">        assetList.getItems().clear();</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">        for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
+<span class="nc" id="L224">            String status = String.format(&quot;%s [%s] - %s (Autonomie: %.1f%%)&quot;,</span>
+<span class="nc" id="L225">                    actif.getId(),</span>
+<span class="nc" id="L226">                    actif.getClass().getSimpleName(),</span>
+<span class="nc" id="L227">                    actif.getEtat(),</span>
+<span class="nc" id="L228">                    (actif.getAutonomieActuelle() / actif.getAutonomieMax()) * 100);</span>
+<span class="nc" id="L229">            assetList.getItems().add(status);</span>
+<span class="nc" id="L230">        }</span>
+
+        // Restore selection
+<span class="nc" id="L233">        assetList.getSelectionModel().clearSelection();</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">        for (int i = 0; i &lt; assetList.getItems().size(); i++) {</span>
+<span class="nc" id="L235">            String item = assetList.getItems().get(i);</span>
+<span class="nc" id="L236">            String id = item.split(&quot; &quot;)[0];</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">            if (selectedIds.contains(id)) {</span>
+<span class="nc" id="L238">                assetList.getSelectionModel().select(i);</span>
+            }
+        }
+<span class="nc" id="L241">    }</span>
+
+    /**
+     * Shows an alert dialog.
+     * 
+     * @param message The message to display.
+     */
+    private void showAlert(String message) {
+<span class="nc" id="L249">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L250">        alert.setTitle(&quot;Error&quot;);</span>
+<span class="nc" id="L251">        alert.setHeaderText(null);</span>
+<span class="nc" id="L252">        alert.setContentText(message);</span>
+<span class="nc" id="L253">        alert.showAndWait();</span>
+<span class="nc" id="L254">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

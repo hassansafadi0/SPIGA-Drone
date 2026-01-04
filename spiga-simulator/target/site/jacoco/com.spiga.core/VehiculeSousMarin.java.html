@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VehiculeSousMarin.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.core</a> &gt; <span class="el_source">VehiculeSousMarin.java</span></div><h1>VehiculeSousMarin.java</h1><pre class="source lang-java linenums">package com.spiga.core;
+
+/**
+ * Class representing a submarine.
+ * Capable of underwater movement (Z &lt; 0).
+ */
+public class VehiculeSousMarin extends ActifMarin {
+
+    /**
+     * Constructor for VehiculeSousMarin.
+     * 
+     * @param id       Unique identifier.
+     * @param position Initial position (Z should be &lt; 0).
+     */
+    public VehiculeSousMarin(String id, Point3D position) {
+<span class="fc" id="L16">        super(id, position, 40.0, 200.0); // Slow, very high autonomy</span>
+<span class="fc" id="L17">    }</span>
+
+    @Override
+    public void envoyerMessage(String destinataire, String message) {
+<span class="nc" id="L21">        System.out.println(getId() + &quot; (Sous-marin) envoie à &quot; + destinataire + &quot;: &quot; + message);</span>
+<span class="nc" id="L22">    }</span>
+
+    @Override
+    public void demarrer() {
+<span class="nc" id="L26">        System.out.println(getId() + &quot; : Moteurs sous-marins activés.&quot;);</span>
+<span class="nc" id="L27">    }</span>
+
+    @Override
+    public void arreter() {
+<span class="nc" id="L31">        System.out.println(getId() + &quot; : Moteurs sous-marins arrêtés.&quot;);</span>
+<span class="nc" id="L32">    }</span>
+
+    @Override
+    public void recharger(double quantite) {
+<span class="nc" id="L36">        setAutonomieActuelle(Math.min(getAutonomieMax(), getAutonomieActuelle() + quantite));</span>
+<span class="nc" id="L37">        System.out.println(getId() + &quot; : Batteries rechargées. Niveau: &quot; + getAutonomieActuelle());</span>
+<span class="nc" id="L38">    }</span>
+
+    @Override
+    public void ravitailler() {
+        // Not applicable for battery, but maybe for oxygen/supplies
+<span class="nc" id="L43">    }</span>
+
+    @Override
+    public void notifierEtatCritique(TypeAlerte type) {
+<span class="nc" id="L47">        System.out.println(&quot;ALERTE SOUS-MARIN &quot; + getId() + &quot;: &quot; + type);</span>
+<span class="nc" id="L48">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

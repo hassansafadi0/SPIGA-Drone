@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DroneReconnaissance.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.core</a> &gt; <span class="el_source">DroneReconnaissance.java</span></div><h1>DroneReconnaissance.java</h1><pre class="source lang-java linenums">package com.spiga.core;
+
+/**
+ * Class representing a reconnaissance drone.
+ * Specialized for surveillance with high speed and autonomy.
+ */
+public class DroneReconnaissance extends ActifAerien {
+
+    private double rayonCapteur; // Sensor radius in meters
+
+    /**
+     * Constructor for DroneReconnaissance.
+     * 
+     * @param id           Unique identifier.
+     * @param position     Initial position.
+     * @param rayonCapteur Sensor radius in meters.
+     */
+    public DroneReconnaissance(String id, Point3D position, double rayonCapteur) {
+<span class="fc" id="L19">        super(id, position, 120.0, 60.0); // Fast, good autonomy</span>
+<span class="fc" id="L20">        this.rayonCapteur = rayonCapteur;</span>
+<span class="fc" id="L21">    }</span>
+
+    /**
+     * Constructor for DroneReconnaissance with default sensor radius.
+     * 
+     * @param id       Unique identifier.
+     * @param position Initial position.
+     */
+    public DroneReconnaissance(String id, Point3D position) {
+<span class="fc" id="L30">        this(id, position, 500.0);</span>
+<span class="fc" id="L31">    }</span>
+
+    /**
+     * Gets the sensor radius.
+     * 
+     * @return The sensor radius in meters.
+     */
+    public double getRayonCapteur() {
+<span class="nc" id="L39">        return rayonCapteur;</span>
+    }
+
+    @Override
+    public void envoyerMessage(String destinataire, String message) {
+<span class="nc" id="L44">        System.out.println(getId() + &quot; (Recon) envoie à &quot; + destinataire + &quot;: &quot; + message);</span>
+<span class="nc" id="L45">    }</span>
+
+    @Override
+    public void demarrer() {
+<span class="fc" id="L49">        System.out.println(getId() + &quot; : Décollage immédiat.&quot;);</span>
+<span class="fc" id="L50">    }</span>
+
+    @Override
+    public void arreter() {
+<span class="fc" id="L54">        System.out.println(getId() + &quot; : Atterrissage.&quot;);</span>
+<span class="fc" id="L55">    }</span>
+
+    @Override
+    public void recharger(double quantite) {
+<span class="nc" id="L59">        setAutonomieActuelle(Math.min(getAutonomieMax(), getAutonomieActuelle() + quantite));</span>
+<span class="nc" id="L60">        System.out.println(getId() + &quot; : Recharge rapide terminée. Niveau: &quot; + getAutonomieActuelle());</span>
+<span class="nc" id="L61">    }</span>
+
+    @Override
+    public void ravitailler() {
+<span class="nc" id="L65">        recharger(100);</span>
+<span class="nc" id="L66">    }</span>
+
+    @Override
+    public void notifierEtatCritique(TypeAlerte type) {
+<span class="fc" id="L70">        System.out.println(&quot;ALERTE RECONNAISSANCE &quot; + getId() + &quot;: &quot; + type);</span>
+<span class="fc" id="L71">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -124,49 +124,27 @@ public class Dashboard extends VBox {
                 double x = Double.parseDouble(txInput.getText());
                 double y = Double.parseDouble(tyInput.getText());
                 double z = Double.parseDouble(tzInput.getText());
-                if (onSetTarget != null) {
-                    onSetTarget.accept(new Point3D(x, y, z), missionTypeSelect.getValue());
-                }
-            } catch (NumberFormatException ex) {
-                showAlert("Invalid target coordinates!");
-            }
-        });
+                Point3D target = new Point3D(x, y, z);
 
-        targetBox.getChildren().addAll(targetPosBox, missionTypeSelect, setTargetBtn);
-
-        // Group Mission Control
-        Button groupMissionBtn = new Button("Create Group Mission (Selected)");
-        groupMissionBtn.setOnAction(e -> {
-            try {
-                double x = Double.parseDouble(txInput.getText());
-                double y = Double.parseDouble(tyInput.getText());
-                double z = Double.parseDouble(tzInput.getText());
-
-                // Get selected items
+                // Check for selection
                 java.util.List<String> selectedItems = assetList.getSelectionModel().getSelectedItems();
-                if (selectedItems.isEmpty()) {
-                    showAlert("No assets selected!");
-                    return;
-                }
 
-                // Extract IDs
-                java.util.List<String> selectedIds = new java.util.ArrayList<>();
-                for (String item : selectedItems) {
-                    // Format: "ID [Type] ..."
-                    String id = item.split(" ")[0];
-                    selectedIds.add(id);
-                }
+                if (!selectedItems.isEmpty()) {
+                    // Group Mission Logic (Selected Assets)
+                    java.util.List<String> selectedIds = new java.util.ArrayList<>();
+                    for (String item : selectedItems) {
+                        if (item != null && !item.isEmpty()) {
+                            selectedIds.add(item.split(" ")[0]);
+                        }
+                    }
 
-                if (onSetTarget != null) {
-                    // We reuse onSetTarget but pass the list of IDs somehow?
-                    // Or we define a new callback for group missions.
-                    // For simplicity, let's assume the MainApp handles the "current selection"
-                    // if we trigger an event, OR we pass the IDs.
-                    // Since onSetTarget currently only takes Point3D and MissionType,
-                    // we need to update the interface or add a new one.
-                    // Let's add a new callback: onCreateGroupMission
                     if (onCreateGroupMission != null) {
-                        onCreateGroupMission.accept(selectedIds, new Point3D(x, y, z));
+                        onCreateGroupMission.accept(selectedIds, target);
+                    }
+                } else {
+                    // Global Logic (All Assets)
+                    if (onSetTarget != null) {
+                        onSetTarget.accept(target, missionTypeSelect.getValue());
                     }
                 }
             } catch (NumberFormatException ex) {
@@ -174,7 +152,7 @@ public class Dashboard extends VBox {
             }
         });
 
-        targetBox.getChildren().add(groupMissionBtn);
+        targetBox.getChildren().addAll(targetPosBox, missionTypeSelect, setTargetBtn);
         this.getChildren().add(targetBox);
     }
 
@@ -231,6 +209,16 @@ public class Dashboard extends VBox {
      * Updates the asset list view.
      */
     public void update() {
+        // Store current selection
+        java.util.List<String> selectedItems = new java.util.ArrayList<>(
+                assetList.getSelectionModel().getSelectedItems());
+        java.util.List<String> selectedIds = new java.util.ArrayList<>();
+        for (String item : selectedItems) {
+            if (item != null && !item.isEmpty()) {
+                selectedIds.add(item.split(" ")[0]);
+            }
+        }
+
         assetList.getItems().clear();
         for (ActifMobile actif : gestionnaire.getFlotte()) {
             String status = String.format("%s [%s] - %s (Autonomie: %.1f%%)",
@@ -239,6 +227,16 @@ public class Dashboard extends VBox {
                     actif.getEtat(),
                     (actif.getAutonomieActuelle() / actif.getAutonomieMax()) * 100);
             assetList.getItems().add(status);
+        }
+
+        // Restore selection
+        assetList.getSelectionModel().clearSelection();
+        for (int i = 0; i < assetList.getItems().size(); i++) {
+            String item = assetList.getItems().get(i);
+            String id = item.split(" ")[0];
+            if (selectedIds.contains(id)) {
+                assetList.getSelectionModel().select(i);
+            }
         }
     }
 

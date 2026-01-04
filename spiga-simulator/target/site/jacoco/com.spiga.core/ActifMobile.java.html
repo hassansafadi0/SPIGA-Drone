@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ActifMobile.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.core</a> &gt; <span class="el_source">ActifMobile.java</span></div><h1>ActifMobile.java</h1><pre class="source lang-java linenums">package com.spiga.core;
+
+import com.spiga.env.ZoneOperation;
+
+/**
+ * Abstract base class for all mobile assets in the simulation.
+ * Implements core interfaces for movement, energy management, communication,
+ * and piloting.
+ */
+import com.spiga.env.Collidable;
+
+/**
+ * Abstract base class for all mobile assets in the simulation.
+ * Implements core interfaces for movement, energy management, communication,
+ * and piloting.
+ */
+public abstract class ActifMobile implements Deplacable, Rechargeable, Communicable, Pilotable, Alertable, Collidable {
+    private String id;
+    private Point3D position;
+    private double vitesseMax;
+    private double autonomieMax;
+    private double autonomieActuelle;
+    private EtatOperationnel etat;
+    private Point3D target; // Individual target for movement
+    private java.util.List&lt;Point3D&gt; currentPath; // Path to follow
+<span class="fc" id="L26">    private double radius = 5.0; // Default collision radius</span>
+
+    /**
+     * Constructor for ActifMobile.
+     * 
+     * @param id           Unique identifier.
+     * @param position     Initial position.
+     * @param vitesseMax   Maximum speed.
+     * @param autonomieMax Maximum autonomy.
+     */
+<span class="fc" id="L36">    public ActifMobile(String id, Point3D position, double vitesseMax, double autonomieMax) {</span>
+<span class="fc" id="L37">        this.id = id;</span>
+<span class="fc" id="L38">        this.position = position;</span>
+<span class="fc" id="L39">        this.vitesseMax = vitesseMax;</span>
+<span class="fc" id="L40">        this.autonomieMax = autonomieMax;</span>
+<span class="fc" id="L41">        this.autonomieActuelle = autonomieMax;</span>
+<span class="fc" id="L42">        this.etat = EtatOperationnel.AU_SOL; // Default state</span>
+<span class="fc" id="L43">        this.target = null; // No target initially</span>
+<span class="fc" id="L44">        this.currentPath = new java.util.ArrayList&lt;&gt;();</span>
+<span class="fc" id="L45">    }</span>
+
+    @Override
+    public double getRadius() {
+<span class="fc" id="L49">        return radius;</span>
+    }
+
+    public void setRadius(double radius) {
+<span class="nc" id="L53">        this.radius = radius;</span>
+<span class="nc" id="L54">    }</span>
+
+    // ... (rest of the class)
+
+    public Point3D getTarget() {
+<span class="nc" id="L59">        return target;</span>
+    }
+
+    public void setTarget(Point3D target) {
+<span class="nc" id="L63">        this.target = target;</span>
+        // Path calculation will be triggered by subclasses or manually
+        // For now, clear path so it recalculates
+<span class="nc" id="L66">        this.currentPath.clear();</span>
+<span class="nc" id="L67">    }</span>
+
+    public java.util.List&lt;Point3D&gt; getCurrentPath() {
+<span class="fc" id="L70">        return currentPath;</span>
+    }
+
+    public void setCurrentPath(java.util.List&lt;Point3D&gt; path) {
+<span class="fc" id="L74">        this.currentPath = path;</span>
+<span class="fc" id="L75">    }</span>
+
+    public String getId() {
+<span class="fc" id="L78">        return id;</span>
+    }
+
+    public Point3D getPosition() {
+<span class="fc" id="L82">        return position;</span>
+    }
+
+    public void setPosition(Point3D position) {
+<span class="fc" id="L86">        this.position = position;</span>
+<span class="fc" id="L87">    }</span>
+
+    public double getVitesseMax() {
+<span class="fc" id="L90">        return vitesseMax;</span>
+    }
+
+    public double getAutonomieMax() {
+<span class="fc" id="L94">        return autonomieMax;</span>
+    }
+
+    public double getAutonomieActuelle() {
+<span class="fc" id="L98">        return autonomieActuelle;</span>
+    }
+
+    public void setAutonomieActuelle(double autonomieActuelle) {
+<span class="fc" id="L102">        this.autonomieActuelle = autonomieActuelle;</span>
+<span class="fc" id="L103">    }</span>
+
+    public EtatOperationnel getEtat() {
+<span class="fc" id="L106">        return etat;</span>
+    }
+
+    public void setEtat(EtatOperationnel etat) {
+<span class="fc" id="L110">        this.etat = etat;</span>
+<span class="fc" id="L111">    }</span>
+
+    // Implementations of interfaces can be abstract or default here
+
+    @Override
+    public void demarrer() {
+<span class="nc bnc" id="L117" title="All 4 branches missed.">        if (etat == EtatOperationnel.EN_PANNE || etat == EtatOperationnel.EN_MAINTENANCE) {</span>
+<span class="nc" id="L118">            System.out.println(&quot;Impossible de démarrer : &quot; + id + &quot; est en &quot; + etat);</span>
+<span class="nc" id="L119">            return;</span>
+        }
+<span class="nc" id="L121">        System.out.println(id + &quot; démarre.&quot;);</span>
+<span class="nc" id="L122">    }</span>
+
+    @Override
+    public void arreter() {
+<span class="nc" id="L126">        System.out.println(id + &quot; s'arrête.&quot;);</span>
+<span class="nc" id="L127">        this.etat = EtatOperationnel.AU_SOL;</span>
+<span class="nc" id="L128">    }</span>
+
+    @Override
+    public void notifierEtatCritique(TypeAlerte type) {
+<span class="nc" id="L132">        System.out.println(&quot;ALERTE [&quot; + id + &quot;]: &quot; + type);</span>
+<span class="nc" id="L133">    }</span>
+
+    @Override
+    public void envoyerMessage(String destinataire, String message) {
+<span class="nc" id="L137">        System.out.println(&quot;Transmission de &quot; + id + &quot; à &quot; + destinataire + &quot;: &quot; + message);</span>
+<span class="nc" id="L138">    }</span>
+
+    @Override
+    public void recharger(double quantite) {
+<span class="nc" id="L142">        this.autonomieActuelle = Math.min(this.autonomieMax, this.autonomieActuelle + quantite);</span>
+<span class="nc" id="L143">        System.out.println(id + &quot; rechargé de &quot; + quantite + &quot;. Niveau: &quot; + this.autonomieActuelle);</span>
+<span class="nc" id="L144">    }</span>
+
+    @Override
+    public void ravitailler() {
+<span class="nc" id="L148">        this.autonomieActuelle = this.autonomieMax;</span>
+<span class="nc" id="L149">        System.out.println(id + &quot; ravitaillé complètement.&quot;);</span>
+<span class="nc" id="L150">    }</span>
+
+    // Abstract methods for movement to be implemented by subclasses
+    @Override
+    public abstract void deplacer(Point3D cible, ZoneOperation zone);
+
+    @Override
+    public abstract java.util.List&lt;Point3D&gt; calculerTrajet(Point3D cible);
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

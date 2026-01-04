@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Point3D.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.core</a> &gt; <span class="el_source">Point3D.java</span></div><h1>Point3D.java</h1><pre class="source lang-java linenums">package com.spiga.core;
+
+/**
+ * Class representing a point in 3D space.
+ */
+public class Point3D {
+    private double x;
+    private double y;
+    private double z;
+
+    /**
+     * Constructor for Point3D.
+     * 
+     * @param x X coordinate.
+     * @param y Y coordinate.
+     * @param z Z coordinate.
+     */
+<span class="fc" id="L18">    public Point3D(double x, double y, double z) {</span>
+<span class="fc" id="L19">        this.x = x;</span>
+<span class="fc" id="L20">        this.y = y;</span>
+<span class="fc" id="L21">        this.z = z;</span>
+<span class="fc" id="L22">    }</span>
+
+    /**
+     * Gets the X coordinate.
+     * 
+     * @return The X coordinate.
+     */
+    public double getX() {
+<span class="fc" id="L30">        return x;</span>
+    }
+
+    public void setX(double x) {
+<span class="nc" id="L34">        this.x = x;</span>
+<span class="nc" id="L35">    }</span>
+
+    public double getY() {
+<span class="fc" id="L38">        return y;</span>
+    }
+
+    public void setY(double y) {
+<span class="nc" id="L42">        this.y = y;</span>
+<span class="nc" id="L43">    }</span>
+
+    public double getZ() {
+<span class="fc" id="L46">        return z;</span>
+    }
+
+    public void setZ(double z) {
+<span class="fc" id="L50">        this.z = z;</span>
+<span class="fc" id="L51">    }</span>
+
+    @Override
+    public String toString() {
+<span class="fc" id="L55">        return &quot;Point3D{&quot; +</span>
+                &quot;x=&quot; + x +
+                &quot;, y=&quot; + y +
+                &quot;, z=&quot; + z +
+                '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Mission.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.mission</a> &gt; <span class="el_source">Mission.java</span></div><h1>Mission.java</h1><pre class="source lang-java linenums">package com.spiga.mission;
+
+import com.spiga.core.ActifMobile;
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class Mission {
+    private String id;
+    private ObjectifMission objectif;
+    private StatutMission statut;
+    private List&lt;ActifMobile&gt; actifsAssignes;
+
+<span class="fc" id="L13">    public Mission(String id, ObjectifMission objectif) {</span>
+<span class="fc" id="L14">        this.id = id;</span>
+<span class="fc" id="L15">        this.objectif = objectif;</span>
+<span class="fc" id="L16">        this.statut = StatutMission.PLANIFIEE;</span>
+<span class="fc" id="L17">        this.actifsAssignes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L18">    }</span>
+
+    /**
+     * Assigns an asset to the mission.
+     * 
+     * @param actif The mobile asset to assign.
+     */
+    public void assignerActif(ActifMobile actif) {
+<span class="fc" id="L26">        this.actifsAssignes.add(actif);</span>
+<span class="fc" id="L27">    }</span>
+
+    /**
+     * Starts the mission.
+     */
+    public void demarrer() {
+<span class="fc" id="L33">        this.statut = StatutMission.EN_COURS;</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        for (ActifMobile actif : actifsAssignes) {</span>
+<span class="fc" id="L35">            actif.demarrer();</span>
+<span class="fc" id="L36">        }</span>
+<span class="fc" id="L37">        System.out.println(&quot;Mission &quot; + id + &quot; démarrée.&quot;);</span>
+<span class="fc" id="L38">    }</span>
+
+    /**
+     * Terminates the mission.
+     */
+    public void terminer() {
+<span class="nc" id="L44">        this.statut = StatutMission.TERMINEE;</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        for (ActifMobile actif : actifsAssignes) {</span>
+<span class="nc" id="L46">            actif.arreter(); // Or return to base</span>
+<span class="nc" id="L47">        }</span>
+<span class="nc" id="L48">        System.out.println(&quot;Mission &quot; + id + &quot; terminée.&quot;);</span>
+<span class="nc" id="L49">    }</span>
+
+    /**
+     * Returns the current status of the mission.
+     * 
+     * @return The status of the mission.
+     */
+    public StatutMission getStatut() {
+<span class="nc" id="L57">        return statut;</span>
+    }
+
+    /**
+     * Gets the mission objective.
+     * 
+     * @return The objective of the mission.
+     */
+    public ObjectifMission getObjectif() {
+<span class="fc" id="L66">        return objectif;</span>
+    }
+
+    /**
+     * Sets the mission objective.
+     * 
+     * @param objectif The new objective.
+     */
+    public void setObjectif(ObjectifMission objectif) {
+<span class="fc" id="L75">        this.objectif = objectif;</span>
+<span class="fc" id="L76">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

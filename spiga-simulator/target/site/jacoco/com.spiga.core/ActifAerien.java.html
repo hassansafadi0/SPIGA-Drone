@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ActifAerien.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.core</a> &gt; <span class="el_source">ActifAerien.java</span></div><h1>ActifAerien.java</h1><pre class="source lang-java linenums">package com.spiga.core;
+
+import com.spiga.env.ZoneOperation;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Abstract class representing an aerial mobile asset.
+ * Extends ActifMobile to provide specific behavior for flying vehicles.
+ */
+public abstract class ActifAerien extends ActifMobile {
+
+    /**
+     * Constructor for ActifAerien.
+     * 
+     * @param id           Unique identifier of the asset.
+     * @param position     Initial 3D position.
+     * @param vitesseMax   Maximum speed of the asset.
+     * @param autonomieMax Maximum autonomy (fuel/battery).
+     */
+    public ActifAerien(String id, Point3D position, double vitesseMax, double autonomieMax) {
+<span class="fc" id="L22">        super(id, position, vitesseMax, autonomieMax);</span>
+<span class="fc" id="L23">    }</span>
+
+    /**
+     * Moves the aerial asset towards a target coordinate.
+     * Considers wind effects and precipitation for energy consumption.
+     * 
+     * @param cible The target 3D point.
+     * @param zone  The simulation zone containing environmental data.
+     */
+    @Override
+    public void deplacer(Point3D cible, ZoneOperation zone) {
+<span class="pc bpc" id="L34" title="2 of 4 branches missed.">        if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() &lt;= 0) {</span>
+<span class="nc" id="L35">            return;</span>
+        }
+
+        // Auto-switch to EN_MISSION if moving
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (getEtat() == EtatOperationnel.AU_SOL) {</span>
+<span class="fc" id="L40">            setEtat(EtatOperationnel.EN_MISSION);</span>
+        }
+
+        // Simple movement logic
+        // Check wind
+<span class="fc" id="L45">        Point3D vent = zone.getVent();</span>
+        // Wind affects speed or consumption? &quot;augmenter la consommation d'énergie et
+        // perturber le cap&quot;
+
+        // Calculate direction
+<span class="fc" id="L50">        double dx = cible.getX() - getPosition().getX();</span>
+<span class="fc" id="L51">        double dy = cible.getY() - getPosition().getY();</span>
+<span class="fc" id="L52">        double dz = cible.getZ() - getPosition().getZ();</span>
+<span class="fc" id="L53">        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);</span>
+
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (distance == 0)</span>
+<span class="fc" id="L56">            return;</span>
+
+        // Normalize
+<span class="fc" id="L59">        double nx = dx / distance;</span>
+<span class="fc" id="L60">        double ny = dy / distance;</span>
+<span class="fc" id="L61">        double nz = dz / distance;</span>
+
+        // Apply speed (simplified)
+<span class="fc" id="L64">        double speed = getVitesseMax();</span>
+
+        // Prevent overshooting
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (speed &gt; distance) {</span>
+<span class="fc" id="L68">            speed = distance;</span>
+        }
+
+        // Wind effect (simplified: subtract wind vector from movement vector? Or add
+        // wind to position?)
+        // If wind is strong, it pushes the drone.
+        // Let's say effective movement = desired_movement + wind * factor
+
+<span class="fc" id="L76">        double moveX = nx * speed;</span>
+<span class="fc" id="L77">        double moveY = ny * speed;</span>
+<span class="fc" id="L78">        double moveZ = nz * speed;</span>
+
+        // Update position
+<span class="fc" id="L81">        Point3D newPos = new Point3D(</span>
+<span class="fc" id="L82">                getPosition().getX() + moveX,</span>
+<span class="fc" id="L83">                getPosition().getY() + moveY,</span>
+<span class="fc" id="L84">                getPosition().getZ() + moveZ);</span>
+
+        // Check collision/bounds
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (!zone.isInside(newPos)) {</span>
+            // System.out.println(getId() + &quot; : Sortie de zone !&quot;);
+<span class="nc" id="L89">            return;</span>
+        }
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (zone.isCollision(newPos, this)) {</span>
+            // System.out.println(getId() + &quot; : Collision détectée !&quot;);
+<span class="fc" id="L93">            notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);</span>
+<span class="fc" id="L94">            return;</span>
+        }
+
+<span class="fc" id="L97">        setPosition(newPos);</span>
+
+        // Consume energy
+        // Base consumption + wind factor + rain factor
+<span class="fc" id="L101">        double consumption = 1.0;</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (zone.getPrecipitations() &gt; 0) {</span>
+<span class="nc" id="L103">            consumption += zone.getPrecipitations() * 0.1;</span>
+        }
+        // Wind opposition increases consumption
+        // Simplified: just add constant if wind is present
+<span class="pc bpc" id="L107" title="2 of 4 branches missed.">        if (vent.getX() != 0 || vent.getY() != 0) {</span>
+<span class="nc" id="L108">            consumption += 0.5;</span>
+        }
+
+<span class="fc" id="L111">        setAutonomieActuelle(getAutonomieActuelle() - consumption);</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        if (getAutonomieActuelle() &lt;= 0) {</span>
+<span class="fc" id="L113">            setAutonomieActuelle(0);</span>
+<span class="fc" id="L114">            setEtat(EtatOperationnel.EN_PANNE); // Or forced landing</span>
+<span class="fc" id="L115">            notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);</span>
+        }
+
+        // System.out.println(getId() + &quot; moved to &quot; + getPosition() + &quot;. Autonomy: &quot; +
+        // getAutonomieActuelle());
+<span class="fc" id="L120">    }</span>
+
+    @Override
+    public List&lt;Point3D&gt; calculerTrajet(Point3D cible) {
+        // Simple direct path
+<span class="nc" id="L125">        List&lt;Point3D&gt; path = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L126">        path.add(getPosition());</span>
+<span class="nc" id="L127">        path.add(cible);</span>
+<span class="nc" id="L128">        return path;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

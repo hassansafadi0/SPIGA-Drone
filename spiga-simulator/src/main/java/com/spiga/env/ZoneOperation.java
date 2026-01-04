@@ -4,6 +4,11 @@ import com.spiga.core.Point3D;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents the operational zone of the simulation.
+ * Manages environmental factors (wind, precipitation, currents), obstacles, and
+ * collision detection.
+ */
 public class ZoneOperation {
     private Point3D minCoord;
     private Point3D maxCoord;
@@ -38,15 +43,15 @@ public class ZoneOperation {
      */
     public static class Island {
         /** X coordinate of the island center/top-left. */
-        public double x;
+        private double x;
         /** Y coordinate of the island center/top-left. */
-        public double y;
+        private double y;
         /** Width or radius of the island. */
-        public double w;
+        private double w;
         /** Height of the island (if not circular). */
-        public double h;
+        private double h;
         /** True if the island is circular, false if rectangular. */
-        public boolean isCircle;
+        private boolean isCircle;
 
         /**
          * Constructor for Island.
@@ -63,6 +68,26 @@ public class ZoneOperation {
             this.w = w;
             this.h = h;
             this.isCircle = isCircle;
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        public double getW() {
+            return w;
+        }
+
+        public double getH() {
+            return h;
+        }
+
+        public boolean isCircle() {
+            return isCircle;
         }
 
         public boolean contains(double px, double py) {

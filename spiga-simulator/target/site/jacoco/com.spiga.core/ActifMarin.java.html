@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ActifMarin.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.core</a> &gt; <span class="el_source">ActifMarin.java</span></div><h1>ActifMarin.java</h1><pre class="source lang-java linenums">package com.spiga.core;
+
+import com.spiga.env.ZoneOperation;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Abstract class representing a marine mobile asset.
+ * Extends ActifMobile to provide specific behavior for water-based vehicles.
+ */
+public abstract class ActifMarin extends ActifMobile {
+
+    /**
+     * Constructor for ActifMarin.
+     * 
+     * @param id           Unique identifier of the asset.
+     * @param position     Initial 3D position.
+     * @param vitesseMax   Maximum speed of the asset.
+     * @param autonomieMax Maximum autonomy (fuel/battery).
+     */
+    public ActifMarin(String id, Point3D position, double vitesseMax, double autonomieMax) {
+<span class="fc" id="L22">        super(id, position, vitesseMax, autonomieMax);</span>
+<span class="fc" id="L23">    }</span>
+
+    /**
+     * Moves the marine asset towards a target coordinate.
+     * Considers ocean currents for movement and energy consumption.
+     * Uses pathfinding to navigate around land obstacles.
+     * 
+     * @param cible The target 3D point.
+     * @param zone  The simulation zone containing environmental data and obstacles.
+     */
+    @Override
+    public void deplacer(Point3D cible, ZoneOperation zone) {
+<span class="pc bpc" id="L35" title="2 of 4 branches missed.">        if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() &lt;= 0) {</span>
+<span class="nc" id="L36">            return;</span>
+        }
+
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if (getEtat() == EtatOperationnel.AU_SOL) {</span>
+<span class="fc" id="L40">            setEtat(EtatOperationnel.EN_MISSION);</span>
+        }
+
+        // Pathfinding Logic
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        if (getCurrentPath().isEmpty()) {</span>
+            // Calculate path if empty
+<span class="fc" id="L46">            List&lt;Point3D&gt; path = zone.findPath(getPosition(), cible, true); // true = isMarine</span>
+<span class="fc" id="L47">            setCurrentPath(path);</span>
+        }
+
+        // Get next waypoint
+<span class="fc" id="L51">        Point3D nextPoint = cible;</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if (!getCurrentPath().isEmpty()) {</span>
+<span class="fc" id="L53">            nextPoint = getCurrentPath().get(0);</span>
+        }
+
+        // Similar logic but with currents
+<span class="fc" id="L57">        Point3D courant = zone.getCourantMarin();</span>
+
+<span class="fc" id="L59">        double dx = nextPoint.getX() - getPosition().getX();</span>
+<span class="fc" id="L60">        double dy = nextPoint.getY() - getPosition().getY();</span>
+<span class="fc" id="L61">        double dz = nextPoint.getZ() - getPosition().getZ();</span>
+<span class="fc" id="L62">        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);</span>
+
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (distance &lt; 5.0) { // Reached waypoint</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            if (!getCurrentPath().isEmpty()) {</span>
+<span class="nc" id="L66">                getCurrentPath().remove(0); // Remove reached point</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">                if (getCurrentPath().isEmpty())</span>
+<span class="nc" id="L68">                    return; // Reached final target</span>
+                // Recurse or wait for next update to move to next point
+<span class="nc" id="L70">                return;</span>
+            }
+        }
+
+<span class="fc" id="L74">        double nx = dx / distance;</span>
+<span class="fc" id="L75">        double ny = dy / distance;</span>
+<span class="fc" id="L76">        double nz = dz / distance;</span>
+
+<span class="fc" id="L78">        double speed = getVitesseMax();</span>
+
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (speed &gt; distance) {</span>
+<span class="nc" id="L81">            speed = distance;</span>
+        }
+
+<span class="fc" id="L84">        double moveX = nx * speed;</span>
+<span class="fc" id="L85">        double moveY = ny * speed;</span>
+<span class="fc" id="L86">        double moveZ = nz * speed;</span>
+
+        // Apply current
+<span class="fc" id="L89">        moveX += courant.getX();</span>
+<span class="fc" id="L90">        moveY += courant.getY();</span>
+<span class="fc" id="L91">        moveZ += courant.getZ();</span>
+
+<span class="fc" id="L93">        Point3D newPos = new Point3D(</span>
+<span class="fc" id="L94">                getPosition().getX() + moveX,</span>
+<span class="fc" id="L95">                getPosition().getY() + moveY,</span>
+<span class="fc" id="L96">                getPosition().getZ() + moveZ);</span>
+
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if (!zone.isInside(newPos)) {</span>
+            // System.out.println(getId() + &quot; : Sortie de zone !&quot;);
+<span class="nc" id="L100">            return;</span>
+        }
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (zone.isCollision(newPos, this)) {</span>
+            // System.out.println(getId() + &quot; : Collision !&quot;);
+<span class="nc" id="L104">            notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);</span>
+<span class="nc" id="L105">            return;</span>
+        }
+
+        // Check Land Collision (for Marine)
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if (zone.isLand(newPos)) {</span>
+            // System.out.println(&quot;Marine vehicle hit land!&quot;);
+<span class="nc" id="L111">            return;</span>
+        }
+
+<span class="fc" id="L114">        setPosition(newPos);</span>
+
+<span class="fc" id="L116">        double consumption = 1.0;</span>
+        // Current opposition
+        // Simplified
+<span class="pc bpc" id="L119" title="3 of 6 branches missed.">        if (courant.getX() != 0 || courant.getY() != 0 || courant.getZ() != 0) {</span>
+<span class="nc" id="L120">            consumption += 0.5;</span>
+        }
+
+<span class="fc" id="L123">        setAutonomieActuelle(getAutonomieActuelle() - consumption);</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        if (getAutonomieActuelle() &lt;= 0) {</span>
+<span class="nc" id="L125">            setAutonomieActuelle(0);</span>
+<span class="nc" id="L126">            setEtat(EtatOperationnel.EN_PANNE);</span>
+<span class="nc" id="L127">            notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);</span>
+        }
+
+        // System.out.println(getId() + &quot; moved to &quot; + getPosition() + &quot;. Autonomy: &quot; +
+        // getAutonomieActuelle());
+<span class="fc" id="L132">    }</span>
+
+    @Override
+    public List&lt;Point3D&gt; calculerTrajet(Point3D cible) {
+<span class="nc" id="L136">        List&lt;Point3D&gt; path = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L137">        path.add(getPosition());</span>
+<span class="nc" id="L138">        path.add(cible);</span>
+<span class="nc" id="L139">        return path;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

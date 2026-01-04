@@ -191,11 +191,12 @@ public class SimulationView extends Pane {
         // Draw Islands
         gc.setFill(Color.LIGHTGREEN);
         for (ZoneOperation.Island island : zone.getIslands()) {
-            if (island.isCircle) {
-                gc.fillOval(island.x * SCALE - (island.w * SCALE), island.y * SCALE - (island.w * SCALE),
-                        island.w * SCALE * 2, island.w * SCALE * 2);
+            if (island.isCircle()) {
+                gc.fillOval(island.getX() * SCALE - (island.getW() * SCALE),
+                        island.getY() * SCALE - (island.getW() * SCALE),
+                        island.getW() * SCALE * 2, island.getW() * SCALE * 2);
             } else {
-                gc.fillRect(island.x * SCALE, island.y * SCALE, island.w * SCALE, island.h * SCALE);
+                gc.fillRect(island.getX() * SCALE, island.getY() * SCALE, island.getW() * SCALE, island.getH() * SCALE);
             }
         }
 

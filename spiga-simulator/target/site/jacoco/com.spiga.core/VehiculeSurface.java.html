@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VehiculeSurface.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.core</a> &gt; <span class="el_source">VehiculeSurface.java</span></div><h1>VehiculeSurface.java</h1><pre class="source lang-java linenums">package com.spiga.core;
+
+/**
+ * Class representing a surface vessel (boat).
+ * Restricted to water surface (Z=0).
+ */
+public class VehiculeSurface extends ActifMarin {
+
+    /**
+     * Constructor for VehiculeSurface.
+     * 
+     * @param id       Unique identifier.
+     * @param position Initial position.
+     */
+    public VehiculeSurface(String id, Point3D position) {
+<span class="fc" id="L16">        super(id, position, 60.0, 150.0); // Medium speed, high autonomy</span>
+<span class="fc" id="L17">    }</span>
+
+    @Override
+    public void envoyerMessage(String destinataire, String message) {
+<span class="nc" id="L21">        System.out.println(getId() + &quot; (Surface) envoie à &quot; + destinataire + &quot;: &quot; + message);</span>
+<span class="nc" id="L22">    }</span>
+
+    @Override
+    public void demarrer() {
+<span class="nc" id="L26">        System.out.println(getId() + &quot; : Moteurs surface activés.&quot;);</span>
+<span class="nc" id="L27">    }</span>
+
+    @Override
+    public void arreter() {
+<span class="nc" id="L31">        System.out.println(getId() + &quot; : Moteurs surface arrêtés.&quot;);</span>
+<span class="nc" id="L32">    }</span>
+
+    @Override
+    public void recharger(double quantite) {
+<span class="nc" id="L36">        setAutonomieActuelle(Math.min(getAutonomieMax(), getAutonomieActuelle() + quantite));</span>
+<span class="nc" id="L37">        System.out.println(getId() + &quot; : Carburant ravitaillé. Niveau: &quot; + getAutonomieActuelle());</span>
+<span class="nc" id="L38">    }</span>
+
+    @Override
+    public void ravitailler() {
+<span class="nc" id="L42">        recharger(100);</span>
+<span class="nc" id="L43">    }</span>
+
+    @Override
+    public void notifierEtatCritique(TypeAlerte type) {
+<span class="nc" id="L47">        System.out.println(&quot;ALERTE SURFACE &quot; + getId() + &quot;: &quot; + type);</span>
+<span class="nc" id="L48">    }</span>
+
+    @Override
+    public void setPosition(Point3D position) {
+        // Ensure Z is always 0
+<span class="fc" id="L53">        super.setPosition(new Point3D(position.getX(), position.getY(), 0));</span>
+<span class="fc" id="L54">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

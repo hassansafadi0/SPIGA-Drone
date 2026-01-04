@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestionnaireEssaim.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.mission</a> &gt; <span class="el_source">GestionnaireEssaim.java</span></div><h1>GestionnaireEssaim.java</h1><pre class="source lang-java linenums">package com.spiga.mission;
+
+import com.spiga.core.ActifMobile;
+import com.spiga.core.EtatOperationnel;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Manages the fleet of mobile assets.
+ * Responsible for adding assets, retrieving the fleet, and suggesting available
+ * assets for missions.
+ */
+public class GestionnaireEssaim {
+    private List&lt;ActifMobile&gt; flotte;
+
+    /**
+     * Constructor for GestionnaireEssaim.
+     * Initializes an empty fleet.
+     */
+<span class="fc" id="L21">    public GestionnaireEssaim() {</span>
+<span class="fc" id="L22">        this.flotte = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L23">    }</span>
+
+    /**
+     * Adds a mobile asset to the fleet.
+     * 
+     * @param actif The asset to add.
+     */
+    public void ajouterActif(ActifMobile actif) {
+<span class="fc" id="L31">        this.flotte.add(actif);</span>
+<span class="fc" id="L32">    }</span>
+
+    /**
+     * Retrieves the entire fleet of assets.
+     * 
+     * @return A list of all assets in the fleet.
+     */
+    public List&lt;ActifMobile&gt; getFlotte() {
+<span class="fc" id="L40">        return flotte;</span>
+    }
+
+    /**
+     * Retrieves a list of available assets (those currently on the ground/idle).
+     * 
+     * @return A list of available assets.
+     */
+    public List&lt;ActifMobile&gt; getActifsDisponibles() {
+<span class="fc" id="L49">        return flotte.stream()</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">                .filter(a -&gt; a.getEtat() == EtatOperationnel.AU_SOL)</span>
+<span class="fc" id="L51">                .collect(Collectors.toList());</span>
+    }
+
+    /**
+     * Suggests an available asset that meets a minimum autonomy requirement.
+     * 
+     * @param minAutonomie The minimum autonomy required.
+     * @return An available asset meeting the criteria, or null if none found.
+     */
+    public ActifMobile suggererActif(double minAutonomie) {
+<span class="fc" id="L61">        return getActifsDisponibles().stream()</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">                .filter(a -&gt; a.getAutonomieActuelle() &gt;= minAutonomie)</span>
+<span class="fc" id="L63">                .findFirst()</span>
+<span class="fc" id="L64">                .orElse(null);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

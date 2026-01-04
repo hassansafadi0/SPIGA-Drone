@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DroneLogistique.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.core</a> &gt; <span class="el_source">DroneLogistique.java</span></div><h1>DroneLogistique.java</h1><pre class="source lang-java linenums">package com.spiga.core;
+
+/**
+ * Class representing a logistics drone.
+ * Specialized for carrying cargo with moderate speed and autonomy.
+ */
+public class DroneLogistique extends ActifAerien {
+
+    private double capaciteEmport; // Cargo capacity in kg
+
+    /**
+     * Constructor for DroneLogistique.
+     * 
+     * @param id             Unique identifier.
+     * @param position       Initial position.
+     * @param capaciteEmport Cargo capacity in kg.
+     */
+    public DroneLogistique(String id, Point3D position, double capaciteEmport) {
+<span class="fc" id="L19">        super(id, position, 80.0, 45.0); // Slower, less autonomy than reconnaissance</span>
+<span class="fc" id="L20">        this.capaciteEmport = capaciteEmport;</span>
+<span class="fc" id="L21">    }</span>
+
+    /**
+     * Constructor for DroneLogistique with default capacity.
+     * 
+     * @param id       Unique identifier.
+     * @param position Initial position.
+     */
+    public DroneLogistique(String id, Point3D position) {
+<span class="fc" id="L30">        this(id, position, 10.0);</span>
+<span class="fc" id="L31">    }</span>
+
+    /**
+     * Gets the cargo capacity.
+     * 
+     * @return The capacity in kg.
+     */
+    public double getCapaciteEmport() {
+<span class="fc" id="L39">        return capaciteEmport;</span>
+    }
+
+    @Override
+    public void envoyerMessage(String destinataire, String message) {
+<span class="fc" id="L44">        System.out.println(getId() + &quot; (Logistique) envoie à &quot; + destinataire + &quot;: &quot; + message);</span>
+<span class="fc" id="L45">    }</span>
+
+    @Override
+    public void demarrer() {
+<span class="fc" id="L49">        System.out.println(getId() + &quot; : Rotors activés.&quot;);</span>
+<span class="fc" id="L50">    }</span>
+
+    @Override
+    public void arreter() {
+<span class="fc" id="L54">        System.out.println(getId() + &quot; : Rotors arrêtés.&quot;);</span>
+<span class="fc" id="L55">    }</span>
+
+    @Override
+    public void recharger(double quantite) {
+<span class="fc" id="L59">        setAutonomieActuelle(Math.min(getAutonomieMax(), getAutonomieActuelle() + quantite));</span>
+<span class="fc" id="L60">        System.out.println(getId() + &quot; : Batterie remplacée. Niveau: &quot; + getAutonomieActuelle());</span>
+<span class="fc" id="L61">    }</span>
+
+    @Override
+    public void ravitailler() {
+<span class="fc" id="L65">        recharger(100);</span>
+<span class="fc" id="L66">    }</span>
+
+    @Override
+    public void notifierEtatCritique(TypeAlerte type) {
+<span class="fc" id="L70">        System.out.println(&quot;ALERTE LOGISTIQUE &quot; + getId() + &quot;: &quot; + type);</span>
+<span class="fc" id="L71">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

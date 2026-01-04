@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MainApp.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spiga-simulator</a> &gt; <a href="index.source.html" class="el_package">com.spiga.ui</a> &gt; <span class="el_source">MainApp.java</span></div><h1>MainApp.java</h1><pre class="source lang-java linenums">package com.spiga.ui;
+
+import com.spiga.core.Point3D;
+import com.spiga.env.ZoneOperation;
+import com.spiga.mission.GestionnaireEssaim;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+
+<span class="nc" id="L11">public class MainApp extends Application {</span>
+
+    private GestionnaireEssaim gestionnaire;
+    private ZoneOperation zone;
+    private SimulationView simulationView;
+    private Dashboard dashboard;
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Initialize Gestionnaire and Zone
+<span class="nc" id="L21">        gestionnaire = new GestionnaireEssaim();</span>
+        // Min Z is -1000 to allow submarines (underwater)
+<span class="nc" id="L23">        zone = new ZoneOperation(new Point3D(0, 0, -1000), new Point3D(1000, 1000, 1000));</span>
+
+        // Add sample assets
+        // Add sample assets
+        // Drones (Air)
+<span class="nc" id="L28">        com.spiga.core.ActifMobile d1 = new com.spiga.core.DroneReconnaissance(&quot;D1&quot;, new Point3D(100, 100, 50));</span>
+<span class="nc" id="L29">        gestionnaire.ajouterActif(d1);</span>
+<span class="nc" id="L30">        zone.addCollidable(d1);</span>
+
+<span class="nc" id="L32">        com.spiga.core.ActifMobile d2 = new com.spiga.core.DroneLogistique(&quot;D2&quot;, new Point3D(200, 200, 50));</span>
+<span class="nc" id="L33">        gestionnaire.ajouterActif(d2);</span>
+<span class="nc" id="L34">        zone.addCollidable(d2);</span>
+
+        // Marine (Water) - Avoid Islands (300,300) and (700,700)
+<span class="nc" id="L37">        com.spiga.core.ActifMobile s1 = new com.spiga.core.VehiculeSurface(&quot;S1&quot;, new Point3D(100, 800, 0));</span>
+<span class="nc" id="L38">        gestionnaire.ajouterActif(s1);</span>
+<span class="nc" id="L39">        zone.addCollidable(s1);</span>
+
+<span class="nc" id="L41">        com.spiga.core.ActifMobile u1 = new com.spiga.core.VehiculeSousMarin(&quot;U1&quot;, new Point3D(800, 100, -50));</span>
+<span class="nc" id="L42">        gestionnaire.ajouterActif(u1);</span>
+<span class="nc" id="L43">        zone.addCollidable(u1);</span>
+
+        // Land (Islands) - Island 1 is at (300,300)
+<span class="nc" id="L46">        com.spiga.core.ActifMobile c1 = new com.spiga.core.VehiculeTerrestre(&quot;C1&quot;, new Point3D(300, 300, 0));</span>
+<span class="nc" id="L47">        gestionnaire.ajouterActif(c1);</span>
+<span class="nc" id="L48">        zone.addCollidable(c1);</span>
+
+        // Initialize UI Components
+<span class="nc" id="L51">        simulationView = new SimulationView(zone, gestionnaire);</span>
+<span class="nc" id="L52">        dashboard = new Dashboard(gestionnaire);</span>
+
+<span class="nc" id="L54">        simulationView.setOnUpdate(() -&gt; dashboard.update());</span>
+
+        // Handle Target Setting (Global target removed, now per-asset)
+<span class="nc" id="L57">        dashboard.setOnSetTarget((target, type) -&gt; {</span>
+            // Optional: Set target for ALL assets or currently selected?
+            // For now, let's make &quot;Set Target&quot; button set target for ALL assets for
+            // convenience
+<span class="nc bnc" id="L61" title="All 2 branches missed.">            for (com.spiga.core.ActifMobile actif : gestionnaire.getFlotte()) {</span>
+<span class="nc" id="L62">                actif.setTarget(target);</span>
+<span class="nc" id="L63">            }</span>
+<span class="nc" id="L64">            System.out.println(&quot;Global target set to: &quot; + target);</span>
+<span class="nc" id="L65">        });</span>
+
+        // Handle Group Mission Creation
+<span class="nc" id="L68">        dashboard.setOnCreateGroupMission((ids, target) -&gt; {</span>
+<span class="nc" id="L69">            com.spiga.mission.Mission mission = new com.spiga.mission.MissionReconnaissance(</span>
+<span class="nc" id="L70">                    &quot;Mission-&quot; + System.currentTimeMillis());</span>
+<span class="nc" id="L71">            mission.setObjectif(com.spiga.mission.ObjectifMission.RECONNAISSANCE); // Default for now</span>
+
+<span class="nc" id="L73">            System.out.println(&quot;Creating group mission for assets: &quot; + ids);</span>
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">            for (String id : ids) {</span>
+                // Find asset by ID
+<span class="nc" id="L77">                com.spiga.core.ActifMobile asset = gestionnaire.getFlotte().stream()</span>
+<span class="nc" id="L78">                        .filter(a -&gt; a.getId().equals(id))</span>
+<span class="nc" id="L79">                        .findFirst()</span>
+<span class="nc" id="L80">                        .orElse(null);</span>
+
+<span class="nc bnc" id="L82" title="All 2 branches missed.">                if (asset != null) {</span>
+<span class="nc" id="L83">                    mission.assignerActif(asset);</span>
+<span class="nc" id="L84">                    asset.setTarget(target); // Set individual target for movement</span>
+<span class="nc" id="L85">                    System.out.println(&quot;Assigned &quot; + id + &quot; to mission.&quot;);</span>
+                }
+<span class="nc" id="L87">            }</span>
+
+<span class="nc" id="L89">            mission.demarrer();</span>
+<span class="nc" id="L90">        });</span>
+
+        // Handle Asset Creation with Validation
+<span class="nc" id="L93">        dashboard.setAssetCreator((type, id, pos) -&gt; {</span>
+            // Validation Logic
+<span class="nc bnc" id="L95" title="All 4 branches missed.">            boolean isMarine = type.contains(&quot;Surface&quot;) || type.contains(&quot;SousMarin&quot;);</span>
+<span class="nc" id="L96">            boolean isLandVehicle = type.contains(&quot;VehiculeTerrestre&quot;);</span>
+<span class="nc" id="L97">            boolean isLand = zone.isLand(pos);</span>
+
+<span class="nc bnc" id="L99" title="All 4 branches missed.">            if (isMarine &amp;&amp; isLand) {</span>
+<span class="nc" id="L100">                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(</span>
+                        javafx.scene.control.Alert.AlertType.ERROR);
+<span class="nc" id="L102">                alert.setContentText(&quot;Marine assets cannot spawn on land!&quot;);</span>
+<span class="nc" id="L103">                alert.showAndWait();</span>
+<span class="nc" id="L104">                return;</span>
+            }
+<span class="nc bnc" id="L106" title="All 4 branches missed.">            if (isLandVehicle &amp;&amp; !isLand) {</span>
+<span class="nc" id="L107">                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(</span>
+                        javafx.scene.control.Alert.AlertType.ERROR);
+<span class="nc" id="L109">                alert.setContentText(&quot;Land vehicles cannot spawn in sea!&quot;);</span>
+<span class="nc" id="L110">                alert.showAndWait();</span>
+<span class="nc" id="L111">                return;</span>
+            }
+
+<span class="nc" id="L114">            com.spiga.core.ActifMobile asset = null;</span>
+<span class="nc bnc" id="L115" title="All 6 branches missed.">            switch (type) {</span>
+                case &quot;DroneReconnaissance&quot;:
+<span class="nc" id="L117">                    asset = new com.spiga.core.DroneReconnaissance(id, pos);</span>
+<span class="nc" id="L118">                    break;</span>
+                case &quot;DroneLogistique&quot;:
+<span class="nc" id="L120">                    asset = new com.spiga.core.DroneLogistique(id, pos);</span>
+<span class="nc" id="L121">                    break;</span>
+                case &quot;VehiculeSurface&quot;:
+<span class="nc" id="L123">                    asset = new com.spiga.core.VehiculeSurface(id, pos);</span>
+<span class="nc" id="L124">                    break;</span>
+                case &quot;VehiculeSousMarin&quot;:
+<span class="nc" id="L126">                    asset = new com.spiga.core.VehiculeSousMarin(id, pos);</span>
+<span class="nc" id="L127">                    break;</span>
+                case &quot;VehiculeTerrestre&quot;:
+<span class="nc" id="L129">                    asset = new com.spiga.core.VehiculeTerrestre(id, pos);</span>
+                    break;
+            }
+
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            if (asset != null) {</span>
+<span class="nc" id="L134">                gestionnaire.ajouterActif(asset);</span>
+<span class="nc" id="L135">                zone.addCollidable(asset); // Register for collision detection</span>
+<span class="nc" id="L136">                dashboard.update(); // Immediate update</span>
+<span class="nc" id="L137">                System.out.println(&quot;Added asset: &quot; + id);</span>
+            }
+<span class="nc" id="L139">        });</span>
+
+<span class="nc" id="L141">        BorderPane root = new BorderPane();</span>
+<span class="nc" id="L142">        root.setCenter(simulationView);</span>
+<span class="nc" id="L143">        root.setRight(dashboard);</span>
+
+<span class="nc" id="L145">        Scene scene = new Scene(root, 1400, 900); // Increased window size</span>
+<span class="nc" id="L146">        primaryStage.setTitle(&quot;SPIGA Simulator - JavaFX&quot;);</span>
+<span class="nc" id="L147">        primaryStage.setScene(scene);</span>
+<span class="nc" id="L148">        primaryStage.show();</span>
+
+        // Start Simulation Loop
+<span class="nc" id="L151">        simulationView.startSimulation();</span>
+<span class="nc" id="L152">    }</span>
+
+    /**
+     * Main entry point for the application.
+     * 
+     * @param args Command line arguments.
+     */
+    public static void main(String[] args) {
+<span class="nc" id="L160">        launch(args);</span>
+<span class="nc" id="L161">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
