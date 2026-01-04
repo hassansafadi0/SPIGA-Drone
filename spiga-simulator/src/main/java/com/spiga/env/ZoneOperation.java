@@ -120,18 +120,42 @@ public class ZoneOperation {
         this.obstacles.add(obstacle);
     }
 
+    /**
+     * Adds a collidable object to the zone.
+     * 
+     * @param c The collidable object.
+     */
     public void addCollidable(Collidable c) {
         this.collidables.add(c);
     }
 
+    /**
+     * Removes a collidable object from the zone.
+     * 
+     * @param c The collidable object to remove.
+     */
     public void removeCollidable(Collidable c) {
         this.collidables.remove(c);
     }
 
+    /**
+     * Checks if a point collides with any obstacle or collidable object.
+     * 
+     * @param point The point to check.
+     * @return True if a collision is detected, false otherwise.
+     */
     public boolean isCollision(Point3D point) {
         return isCollision(point, null);
     }
 
+    /**
+     * Checks if a point collides with any obstacle or collidable object, ignoring a
+     * specific object.
+     * 
+     * @param point    The point to check.
+     * @param ignoreMe The collidable object to ignore (usually self).
+     * @return True if a collision is detected, false otherwise.
+     */
     public boolean isCollision(Point3D point, Collidable ignoreMe) {
         // Check static obstacles
         for (Obstacle obs : obstacles) {
@@ -162,6 +186,12 @@ public class ZoneOperation {
         return false;
     }
 
+    /**
+     * Checks if a point is inside the zone boundaries.
+     * 
+     * @param point The point to check.
+     * @return True if inside, false otherwise.
+     */
     public boolean isInside(Point3D point) {
         return point.getX() >= minCoord.getX() && point.getX() <= maxCoord.getX() &&
                 point.getY() >= minCoord.getY() && point.getY() <= maxCoord.getY() &&
@@ -169,6 +199,15 @@ public class ZoneOperation {
     }
 
     // A* Pathfinding
+    /**
+     * Finds a path from start to end using A* algorithm.
+     * 
+     * @param start    Starting point.
+     * @param end      Ending point.
+     * @param isMarine True if the vehicle is marine (avoids land), false if land
+     *                 vehicle (avoids water).
+     * @return A list of points representing the path.
+     */
     public List<Point3D> findPath(Point3D start, Point3D end, boolean isMarine) {
         // Simple grid-based A*
         Node startNode = new Node((int) (start.getX() / 20), (int) (start.getY() / 20));

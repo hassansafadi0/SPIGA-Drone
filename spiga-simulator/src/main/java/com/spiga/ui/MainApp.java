@@ -54,14 +54,39 @@ public class MainApp extends Application {
         simulationView.setOnUpdate(() -> dashboard.update());
 
         // Handle Target Setting (Global target removed, now per-asset)
-        dashboard.setOnSetTarget((target, missionType) -> {
+        dashboard.setOnSetTarget((target, type) -> {
             // Optional: Set target for ALL assets or currently selected?
             // For now, let's make "Set Target" button set target for ALL assets for
             // convenience
             for (com.spiga.core.ActifMobile actif : gestionnaire.getFlotte()) {
                 actif.setTarget(target);
             }
-            System.out.println("Global target set to: " + target + " with mission: " + missionType);
+            System.out.println("Global target set to: " + target);
+        });
+
+        // Handle Group Mission Creation
+        dashboard.setOnCreateGroupMission((ids, target) -> {
+            com.spiga.mission.Mission mission = new com.spiga.mission.MissionReconnaissance(
+                    "Mission-" + System.currentTimeMillis());
+            mission.setObjectif(com.spiga.mission.ObjectifMission.RECONNAISSANCE); // Default for now
+
+            System.out.println("Creating group mission for assets: " + ids);
+
+            for (String id : ids) {
+                // Find asset by ID
+                com.spiga.core.ActifMobile asset = gestionnaire.getFlotte().stream()
+                        .filter(a -> a.getId().equals(id))
+                        .findFirst()
+                        .orElse(null);
+
+                if (asset != null) {
+                    mission.assignerActif(asset);
+                    asset.setTarget(target); // Set individual target for movement
+                    System.out.println("Assigned " + id + " to mission.");
+                }
+            }
+
+            mission.demarrer();
         });
 
         // Handle Asset Creation with Validation

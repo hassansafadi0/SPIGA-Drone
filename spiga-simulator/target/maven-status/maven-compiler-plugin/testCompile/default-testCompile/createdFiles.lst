@@ -1,2 +1,4 @@
 com/spiga/core/CollisionTest.class
+com/spiga/mission/GestionnaireEssaimTest.class
+com/spiga/env/ZoneOperationTest.class
 com/spiga/core/ActifAerienTest.class

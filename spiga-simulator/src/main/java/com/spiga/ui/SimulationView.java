@@ -16,7 +16,7 @@ public class SimulationView extends Pane {
     private Canvas canvas;
     private AnimationTimer timer;
 
-    private ActifMobile selectedAsset = null;
+    private java.util.List<ActifMobile> selectedAssets = new java.util.ArrayList<>();
     private final double SCALE = 0.9; // 1000 world -> 900 canvas
 
     public SimulationView(ZoneOperation zone, GestionnaireEssaim gestionnaire) {
@@ -39,7 +39,7 @@ public class SimulationView extends Pane {
                 boolean clickedAsset = handleSelection(mx, my);
 
                 // If we didn't click an asset, but have one selected, move it
-                if (!clickedAsset && selectedAsset != null) {
+                if (!clickedAsset && !selectedAssets.isEmpty()) {
                     handleMoveCommand(mx, my);
                 }
             } else if (e.getButton() == javafx.scene.input.MouseButton.SECONDARY) {
@@ -84,6 +84,10 @@ public class SimulationView extends Pane {
 
     private boolean handleSelection(double mx, double my) {
         boolean clickedOnAsset = false;
+        // If CTRL is not held, clear selection (simplified logic: assume always
+        // multi-select or toggle)
+        // For now, let's implement simple toggle behavior
+
         for (ActifMobile actif : gestionnaire.getFlotte()) {
             // Map world to canvas
             double x = actif.getPosition().getX() * SCALE;
@@ -91,13 +95,26 @@ public class SimulationView extends Pane {
 
             // Simple hit detection (radius 20 for easier clicking)
             if (Math.abs(mx - x) < 20 && Math.abs(my - y) < 20) {
-                selectedAsset = actif;
-                System.out.println("Selected: " + actif.getId());
+                if (selectedAssets.contains(actif)) {
+                    selectedAssets.remove(actif);
+                    System.out.println("Deselected: " + actif.getId());
+                } else {
+                    selectedAssets.add(actif);
+                    System.out.println("Selected: " + actif.getId());
+                }
                 draw();
                 clickedOnAsset = true;
-                break;
+                break; // Only select one at a time per click
             }
         }
+
+        // If clicked on empty space, clear selection?
+        if (!clickedOnAsset) {
+            // Optional: Clear selection if clicking on empty space
+            // selectedAssets.clear();
+            // draw();
+        }
+
         return clickedOnAsset;
     }
 
@@ -109,32 +126,35 @@ public class SimulationView extends Pane {
      * @param my Mouse Y coordinate.
      */
     private void handleMoveCommand(double mx, double my) {
-        if (selectedAsset == null)
+        if (selectedAssets.isEmpty())
             return;
 
         // Map canvas back to world
         double wx = mx / SCALE;
         double wy = my / SCALE;
-        double wz = selectedAsset.getPosition().getZ(); // Keep current altitude/depth by default
 
-        // Constraints
-        // 1. Marine assets cannot go on land
-        if (selectedAsset instanceof com.spiga.core.ActifMarin) {
-            if (zone.isLand(new Point3D(wx, wy, 0))) {
-                System.out.println("Cannot move marine asset to land!");
-                return;
-            }
-        }
-        // 2. Land vehicles cannot go into water
-        if (selectedAsset instanceof com.spiga.core.VehiculeTerrestre) {
-            if (!zone.isLand(new Point3D(wx, wy, 0))) {
-                System.out.println("Cannot move land vehicle to water!");
-                return;
-            }
-        }
+        for (ActifMobile asset : selectedAssets) {
+            double wz = asset.getPosition().getZ(); // Keep current altitude/depth
 
-        selectedAsset.setTarget(new Point3D(wx, wy, wz));
-        System.out.println("Moving " + selectedAsset.getId() + " to " + wx + ", " + wy);
+            // Constraints
+            // 1. Marine assets cannot go on land
+            if (asset instanceof com.spiga.core.ActifMarin) {
+                if (zone.isLand(new Point3D(wx, wy, 0))) {
+                    System.out.println("Cannot move marine asset " + asset.getId() + " to land!");
+                    continue;
+                }
+            }
+            // 2. Land vehicles cannot go into water
+            if (asset instanceof com.spiga.core.VehiculeTerrestre) {
+                if (!zone.isLand(new Point3D(wx, wy, 0))) {
+                    System.out.println("Cannot move land vehicle " + asset.getId() + " to water!");
+                    continue;
+                }
+            }
+
+            asset.setTarget(new Point3D(wx, wy, wz));
+            System.out.println("Moving " + asset.getId() + " to " + wx + ", " + wy);
+        }
     }
 
     /**
@@ -192,7 +212,7 @@ public class SimulationView extends Pane {
 
         gc.setFill(getColorForType(actif));
 
-        if (actif == selectedAsset) {
+        if (selectedAssets.contains(actif)) {
             gc.setStroke(Color.RED);
             gc.setLineWidth(2);
             gc.strokeOval(x - 15, y - 15, 30, 30);

@@ -65,4 +65,13 @@ public abstract class Mission {
     public ObjectifMission getObjectif() {
         return objectif;
     }
+
+    /**
+     * Sets the mission objective.
+     * 
+     * @param objectif The new objective.
+     */
+    public void setObjectif(ObjectifMission objectif) {
+        this.objectif = objectif;
+    }
 }

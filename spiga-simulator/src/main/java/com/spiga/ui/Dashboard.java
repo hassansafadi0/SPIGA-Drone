@@ -91,6 +91,7 @@ public class Dashboard extends VBox {
         // Asset List
         this.getChildren().add(new Label("Current Assets:"));
         assetList = new ListView<>();
+        assetList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         update(); // Initial population
         this.getChildren().add(assetList);
 
@@ -132,7 +133,55 @@ public class Dashboard extends VBox {
         });
 
         targetBox.getChildren().addAll(targetPosBox, missionTypeSelect, setTargetBtn);
+
+        // Group Mission Control
+        Button groupMissionBtn = new Button("Create Group Mission (Selected)");
+        groupMissionBtn.setOnAction(e -> {
+            try {
+                double x = Double.parseDouble(txInput.getText());
+                double y = Double.parseDouble(tyInput.getText());
+                double z = Double.parseDouble(tzInput.getText());
+
+                // Get selected items
+                java.util.List<String> selectedItems = assetList.getSelectionModel().getSelectedItems();
+                if (selectedItems.isEmpty()) {
+                    showAlert("No assets selected!");
+                    return;
+                }
+
+                // Extract IDs
+                java.util.List<String> selectedIds = new java.util.ArrayList<>();
+                for (String item : selectedItems) {
+                    // Format: "ID [Type] ..."
+                    String id = item.split(" ")[0];
+                    selectedIds.add(id);
+                }
+
+                if (onSetTarget != null) {
+                    // We reuse onSetTarget but pass the list of IDs somehow?
+                    // Or we define a new callback for group missions.
+                    // For simplicity, let's assume the MainApp handles the "current selection"
+                    // if we trigger an event, OR we pass the IDs.
+                    // Since onSetTarget currently only takes Point3D and MissionType,
+                    // we need to update the interface or add a new one.
+                    // Let's add a new callback: onCreateGroupMission
+                    if (onCreateGroupMission != null) {
+                        onCreateGroupMission.accept(selectedIds, new Point3D(x, y, z));
+                    }
+                }
+            } catch (NumberFormatException ex) {
+                showAlert("Invalid target coordinates!");
+            }
+        });
+
+        targetBox.getChildren().add(groupMissionBtn);
         this.getChildren().add(targetBox);
+    }
+
+    private BiConsumer<java.util.List<String>, Point3D> onCreateGroupMission;
+
+    public void setOnCreateGroupMission(BiConsumer<java.util.List<String>, Point3D> callback) {
+        this.onCreateGroupMission = callback;
     }
 
     /**
