@@ -8,7 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.function.Consumer;
+import com.spiga.mission.ObjectifMission;
+import java.util.function.BiConsumer;
 
 public class Dashboard extends VBox {
     private GestionnaireEssaim gestionnaire;
@@ -18,7 +19,7 @@ public class Dashboard extends VBox {
     private TextField idInput;
     private TextField xInput, yInput, zInput;
     private AssetCreator assetCreator;
-    private Consumer<Point3D> onSetTarget;
+    private BiConsumer<Point3D, ObjectifMission> onSetTarget;
 
     /**
      * Functional interface for creating assets.
@@ -112,6 +113,10 @@ public class Dashboard extends VBox {
         tzInput.setPrefWidth(60);
         targetPosBox.getChildren().addAll(new Label("X:"), txInput, new Label("Y:"), tyInput, new Label("Z:"), tzInput);
 
+        ComboBox<ObjectifMission> missionTypeSelect = new ComboBox<>();
+        missionTypeSelect.getItems().setAll(ObjectifMission.values());
+        missionTypeSelect.getSelectionModel().select(ObjectifMission.RECONNAISSANCE);
+
         Button setTargetBtn = new Button("Set Target");
         setTargetBtn.setOnAction(e -> {
             try {
@@ -119,14 +124,14 @@ public class Dashboard extends VBox {
                 double y = Double.parseDouble(tyInput.getText());
                 double z = Double.parseDouble(tzInput.getText());
                 if (onSetTarget != null) {
-                    onSetTarget.accept(new Point3D(x, y, z));
+                    onSetTarget.accept(new Point3D(x, y, z), missionTypeSelect.getValue());
                 }
             } catch (NumberFormatException ex) {
                 showAlert("Invalid target coordinates!");
             }
         });
 
-        targetBox.getChildren().addAll(targetPosBox, setTargetBtn);
+        targetBox.getChildren().addAll(targetPosBox, missionTypeSelect, setTargetBtn);
         this.getChildren().add(targetBox);
     }
 
@@ -144,7 +149,7 @@ public class Dashboard extends VBox {
      * 
      * @param onSetTarget The callback.
      */
-    public void setOnSetTarget(Consumer<Point3D> onSetTarget) {
+    public void setOnSetTarget(BiConsumer<Point3D, ObjectifMission> onSetTarget) {
         this.onSetTarget = onSetTarget;
     }
 

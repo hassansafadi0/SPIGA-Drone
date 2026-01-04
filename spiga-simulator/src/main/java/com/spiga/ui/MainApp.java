@@ -54,14 +54,14 @@ public class MainApp extends Application {
         simulationView.setOnUpdate(() -> dashboard.update());
 
         // Handle Target Setting (Global target removed, now per-asset)
-        dashboard.setOnSetTarget(target -> {
+        dashboard.setOnSetTarget((target, missionType) -> {
             // Optional: Set target for ALL assets or currently selected?
             // For now, let's make "Set Target" button set target for ALL assets for
             // convenience
             for (com.spiga.core.ActifMobile actif : gestionnaire.getFlotte()) {
                 actif.setTarget(target);
             }
-            System.out.println("Global target set to: " + target);
+            System.out.println("Global target set to: " + target + " with mission: " + missionType);
         });
 
         // Handle Asset Creation with Validation

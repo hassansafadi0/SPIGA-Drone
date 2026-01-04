@@ -23,16 +23,6 @@ public class GestionnaireEssaim {
 
     public List<ActifMobile> getActifsDisponibles() {
         return flotte.stream()
-                .filter(a -> a.getEtat() == EtatOperationnel.AU_SOL || a.getEtat() == EtatOperationnel.EN_MISSION) // Assuming
-                                                                                                                   // EN_MISSION
-                                                                                                                   // can
-                                                                                                                   // be
-                                                                                                                   // reassigned
-                                                                                                                   // or
-                                                                                                                   // available
-                                                                                                                   // means
-                                                                                                                   // ready
-                // Actually available usually means AU_SOL (idle).
                 .filter(a -> a.getEtat() == EtatOperationnel.AU_SOL)
                 .collect(Collectors.toList());
     }
