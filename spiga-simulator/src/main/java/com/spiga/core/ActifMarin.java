@@ -32,110 +32,122 @@ public abstract class ActifMarin extends ActifMobile {
      */
     @Override
     public void deplacer(Point3D cible, ZoneOperation zone) {
-        if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() <= 0) {
-            return;
-        }
-
-        if (getEtat() == EtatOperationnel.AU_SOL) {
-            setEtat(EtatOperationnel.EN_MISSION);
-        }
-
-        // Pathfinding Logic
-        if (getCurrentPath().isEmpty()) {
-            // Calculate path if empty
-            List<Point3D> path = zone.findPath(getPosition(), cible, true); // true = isMarine
-            setCurrentPath(path);
-        }
-
-        // Get next waypoint
-        Point3D nextPoint = cible;
-        if (!getCurrentPath().isEmpty()) {
-            nextPoint = getCurrentPath().get(0);
-        }
-
-        // Similar logic but with currents
-        Point3D courant = zone.getCourantMarin();
-
-        double dx = nextPoint.getX() - getPosition().getX();
-        double dy = nextPoint.getY() - getPosition().getY();
-        double dz = nextPoint.getZ() - getPosition().getZ();
-        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-        if (distance < 5.0) { // Reached waypoint
-            if (!getCurrentPath().isEmpty()) {
-                getCurrentPath().remove(0); // Remove reached point
-                if (getCurrentPath().isEmpty())
-                    return; // Reached final target
-                // Recurse or wait for next update to move to next point
+        try {
+            if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() <= 0) {
                 return;
             }
-        }
 
-        double nx = dx / distance;
-        double ny = dy / distance;
-        double nz = dz / distance;
+            if (getEtat() == EtatOperationnel.AU_SOL) {
+                setEtat(EtatOperationnel.EN_MISSION);
+            }
 
-        double speed = getVitesseMax();
+            // Pathfinding Logic
+            if (getCurrentPath().isEmpty()) {
+                // Calculate path if empty
+                List<Point3D> path = zone.findPath(getPosition(), cible, true); // true = isMarine
+                setCurrentPath(path);
+            }
 
-        if (speed > distance) {
-            speed = distance;
-        }
+            // Get next waypoint
+            Point3D nextPoint = cible;
+            if (!getCurrentPath().isEmpty()) {
+                nextPoint = getCurrentPath().get(0);
+            }
 
-        double moveX = nx * speed;
-        double moveY = ny * speed;
-        double moveZ = nz * speed;
+            // Similar logic but with currents
+            Point3D courant = zone.getCourantMarin();
 
-        // Apply current
-        moveX += courant.getX();
-        moveY += courant.getY();
-        moveZ += courant.getZ();
+            double dx = nextPoint.getX() - getPosition().getX();
+            double dy = nextPoint.getY() - getPosition().getY();
+            double dz = nextPoint.getZ() - getPosition().getZ();
+            double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-        Point3D newPos = new Point3D(
-                getPosition().getX() + moveX,
-                getPosition().getY() + moveY,
-                getPosition().getZ() + moveZ);
+            if (distance < 5.0) { // Reached waypoint
+                if (!getCurrentPath().isEmpty()) {
+                    getCurrentPath().remove(0); // Remove reached point
+                    if (getCurrentPath().isEmpty())
+                        return; // Reached final target
+                    // Recurse or wait for next update to move to next point
+                    return;
+                }
+            }
 
-        if (!zone.isInside(newPos)) {
-            // System.out.println(getId() + " : Sortie de zone !");
-            return;
-        }
-        if (zone.isCollision(newPos, this)) {
-            // System.out.println(getId() + " : Collision !");
-            notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);
-            return;
-        }
+            double nx = dx / distance;
+            double ny = dy / distance;
+            double nz = dz / distance;
 
-        // Check Land Collision (for Marine)
-        if (zone.isLand(newPos)) {
-            // System.out.println("Marine vehicle hit land!");
-            return;
-        }
+            double speed = getVitesseMax();
 
-        setPosition(newPos);
+            if (speed > distance) {
+                speed = distance;
+            }
 
-        double consumption = 1.0;
-        // Current opposition
-        // Simplified
-        if (courant.getX() != 0 || courant.getY() != 0 || courant.getZ() != 0) {
-            consumption += 0.5;
-        }
+            double moveX = nx * speed;
+            double moveY = ny * speed;
+            double moveZ = nz * speed;
 
-        setAutonomieActuelle(getAutonomieActuelle() - consumption);
-        if (getAutonomieActuelle() <= 0) {
-            setAutonomieActuelle(0);
+            // Apply current
+            moveX += courant.getX();
+            moveY += courant.getY();
+            moveZ += courant.getZ();
+
+            Point3D newPos = new Point3D(
+                    getPosition().getX() + moveX,
+                    getPosition().getY() + moveY,
+                    getPosition().getZ() + moveZ);
+
+            if (!zone.isInside(newPos)) {
+                // System.out.println(getId() + " : Sortie de zone !");
+                return;
+            }
+            if (zone.isCollision(newPos, this)) {
+                // System.out.println(getId() + " : Collision !");
+                notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);
+                return;
+            }
+
+            // Check Land Collision (for Marine)
+            if (zone.isLand(newPos)) {
+                // System.out.println("Marine vehicle hit land!");
+                return;
+            }
+
+            setPosition(newPos);
+
+            double consumption = 1.0;
+            // Current opposition
+            // Simplified
+            if (courant.getX() != 0 || courant.getY() != 0 || courant.getZ() != 0) {
+                consumption += 0.5;
+            }
+
+            setAutonomieActuelle(getAutonomieActuelle() - consumption);
+            if (getAutonomieActuelle() <= 0) {
+                setAutonomieActuelle(0);
+                setEtat(EtatOperationnel.EN_PANNE);
+                notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);
+            }
+
+            // System.out.println(getId() + " moved to " + getPosition() + ". Autonomy: " +
+            // getAutonomieActuelle());
+        } catch (Exception e) {
+            System.err.println("Error moving marine asset " + getId() + ": " + e.getMessage());
+            e.printStackTrace();
             setEtat(EtatOperationnel.EN_PANNE);
-            notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);
         }
-
-        // System.out.println(getId() + " moved to " + getPosition() + ". Autonomy: " +
-        // getAutonomieActuelle());
     }
 
     @Override
     public List<Point3D> calculerTrajet(Point3D cible) {
-        List<Point3D> path = new ArrayList<>();
-        path.add(getPosition());
-        path.add(cible);
-        return path;
+        try {
+            List<Point3D> path = new ArrayList<>();
+            path.add(getPosition());
+            path.add(cible);
+            return path;
+        } catch (Exception e) {
+            System.err.println("Error calculating path for " + getId() + ": " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 }

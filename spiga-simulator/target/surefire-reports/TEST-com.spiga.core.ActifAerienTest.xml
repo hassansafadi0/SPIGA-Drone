@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.spiga.core.ActifAerienTest" time="0.002" tests="2" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.spiga.core.ActifAerienTest" time="0.001" tests="2" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
-    <property name="java.class.path" value="/home/LouiZz/Documents/javadrone/spiga-simulator/target/test-classes:/home/LouiZz/Documents/javadrone/spiga-simulator/target/classes:/home/LouiZz/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/LouiZz/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/LouiZz/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/LouiZz/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/LouiZz/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/LouiZz/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-controls/17.0.8/javafx-controls-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-controls/17.0.8/javafx-controls-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-graphics/17.0.8/javafx-graphics-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-graphics/17.0.8/javafx-graphics-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-base/17.0.8/javafx-base-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-base/17.0.8/javafx-base-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-fxml/17.0.8/javafx-fxml-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-fxml/17.0.8/javafx-fxml-17.0.8-linux.jar:"/>
+    <property name="java.class.path" value="/home/LouiZz/Documents/SAFADI-GHANEM-RIZO-ODEBRINO/javadrone/spiga-simulator/target/test-classes:/home/LouiZz/Documents/SAFADI-GHANEM-RIZO-ODEBRINO/javadrone/spiga-simulator/target/classes:/home/LouiZz/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/LouiZz/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/LouiZz/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/LouiZz/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/LouiZz/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/LouiZz/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-controls/17.0.8/javafx-controls-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-controls/17.0.8/javafx-controls-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-graphics/17.0.8/javafx-graphics-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-graphics/17.0.8/javafx-graphics-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-base/17.0.8/javafx-base-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-base/17.0.8/javafx-base-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-fxml/17.0.8/javafx-fxml-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-fxml/17.0.8/javafx-fxml-17.0.8-linux.jar:"/>
     <property name="java.vm.vendor" value="Arch Linux"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.vendor.url" value="https://openjdk.java.net/"/>
@@ -12,9 +12,9 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-17-openjdk/lib"/>
-    <property name="sun.java.command" value="/home/LouiZz/Documents/javadrone/spiga-simulator/target/surefire/surefirebooter-20260104211344960_3.jar /home/LouiZz/Documents/javadrone/spiga-simulator/target/surefire 2026-01-04T21-13-44_913-jvmRun1 surefire-20260104211344960_1tmp surefire_0-20260104211344960_2tmp"/>
+    <property name="sun.java.command" value="/home/LouiZz/Documents/SAFADI-GHANEM-RIZO-ODEBRINO/javadrone/spiga-simulator/target/surefire/surefirebooter-20260107114754023_3.jar /home/LouiZz/Documents/SAFADI-GHANEM-RIZO-ODEBRINO/javadrone/spiga-simulator/target/surefire 2026-01-07T11-47-53_979-jvmRun1 surefire-20260107114754023_1tmp surefire_0-20260107114754023_2tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="surefire.test.class.path" value="/home/LouiZz/Documents/javadrone/spiga-simulator/target/test-classes:/home/LouiZz/Documents/javadrone/spiga-simulator/target/classes:/home/LouiZz/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/LouiZz/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/LouiZz/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/LouiZz/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/LouiZz/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/LouiZz/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-controls/17.0.8/javafx-controls-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-controls/17.0.8/javafx-controls-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-graphics/17.0.8/javafx-graphics-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-graphics/17.0.8/javafx-graphics-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-base/17.0.8/javafx-base-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-base/17.0.8/javafx-base-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-fxml/17.0.8/javafx-fxml-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-fxml/17.0.8/javafx-fxml-17.0.8-linux.jar:"/>
+    <property name="surefire.test.class.path" value="/home/LouiZz/Documents/SAFADI-GHANEM-RIZO-ODEBRINO/javadrone/spiga-simulator/target/test-classes:/home/LouiZz/Documents/SAFADI-GHANEM-RIZO-ODEBRINO/javadrone/spiga-simulator/target/classes:/home/LouiZz/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/LouiZz/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/LouiZz/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/LouiZz/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/LouiZz/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/LouiZz/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-controls/17.0.8/javafx-controls-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-controls/17.0.8/javafx-controls-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-graphics/17.0.8/javafx-graphics-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-graphics/17.0.8/javafx-graphics-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-base/17.0.8/javafx-base-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-base/17.0.8/javafx-base-17.0.8-linux.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-fxml/17.0.8/javafx-fxml-17.0.8.jar:/home/LouiZz/.m2/repository/org/openjfx/javafx-fxml/17.0.8/javafx-fxml-17.0.8-linux.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="/home/LouiZz"/>
     <property name="user.language" value="en"/>
@@ -22,12 +22,12 @@
     <property name="java.version.date" value="2025-10-21"/>
     <property name="java.home" value="/usr/lib/jvm/java-17-openjdk"/>
     <property name="file.separator" value="/"/>
-    <property name="basedir" value="/home/LouiZz/Documents/javadrone/spiga-simulator"/>
+    <property name="basedir" value="/home/LouiZz/Documents/SAFADI-GHANEM-RIZO-ODEBRINO/javadrone/spiga-simulator"/>
     <property name="java.vm.compressedOopsMode" value="Zero based"/>
     <property name="line.separator" value="&#10;"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
-    <property name="surefire.real.class.path" value="/home/LouiZz/Documents/javadrone/spiga-simulator/target/surefire/surefirebooter-20260104211344960_3.jar"/>
+    <property name="surefire.real.class.path" value="/home/LouiZz/Documents/SAFADI-GHANEM-RIZO-ODEBRINO/javadrone/spiga-simulator/target/surefire/surefirebooter-20260107114754023_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.17+10"/>
     <property name="user.name" value="LouiZz"/>
@@ -40,7 +40,7 @@
     <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
     <property name="java.io.tmpdir" value="/tmp"/>
     <property name="java.version" value="17.0.17"/>
-    <property name="user.dir" value="/home/LouiZz/Documents/javadrone/spiga-simulator"/>
+    <property name="user.dir" value="/home/LouiZz/Documents/SAFADI-GHANEM-RIZO-ODEBRINO/javadrone/spiga-simulator"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="native.encoding" value="UTF-8"/>
@@ -52,7 +52,7 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testConsumption" classname="com.spiga.core.ActifAerienTest" time="0.001"/>
+  <testcase name="testConsumption" classname="com.spiga.core.ActifAerienTest" time="0.0"/>
   <testcase name="testDeplacement" classname="com.spiga.core.ActifAerienTest" time="0.0">
     <system-out><![CDATA[D1 : Décollage immédiat.
 ]]></system-out>

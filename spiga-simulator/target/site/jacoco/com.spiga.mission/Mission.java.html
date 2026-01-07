@@ -23,30 +23,59 @@ public abstract class Mission {
      * @param actif The mobile asset to assign.
      */
     public void assignerActif(ActifMobile actif) {
-<span class="fc" id="L26">        this.actifsAssignes.add(actif);</span>
-<span class="fc" id="L27">    }</span>
+        try {
+<span class="pc bpc" id="L27" title="1 of 2 branches missed.">            if (actif == null) {</span>
+<span class="nc" id="L28">                System.err.println(&quot;Cannot assign null asset to mission &quot; + id);</span>
+<span class="nc" id="L29">                return;</span>
+            }
+<span class="fc" id="L31">            this.actifsAssignes.add(actif);</span>
+<span class="nc" id="L32">        } catch (Exception e) {</span>
+<span class="nc" id="L33">            System.err.println(&quot;Error assigning asset to mission &quot; + id + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L34">            e.printStackTrace();</span>
+<span class="fc" id="L35">        }</span>
+<span class="fc" id="L36">    }</span>
 
     /**
      * Starts the mission.
      */
     public void demarrer() {
-<span class="fc" id="L33">        this.statut = StatutMission.EN_COURS;</span>
-<span class="fc bfc" id="L34" title="All 2 branches covered.">        for (ActifMobile actif : actifsAssignes) {</span>
-<span class="fc" id="L35">            actif.demarrer();</span>
-<span class="fc" id="L36">        }</span>
-<span class="fc" id="L37">        System.out.println(&quot;Mission &quot; + id + &quot; démarrée.&quot;);</span>
-<span class="fc" id="L38">    }</span>
+        try {
+<span class="fc" id="L43">            this.statut = StatutMission.EN_COURS;</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">            for (ActifMobile actif : actifsAssignes) {</span>
+                try {
+<span class="fc" id="L46">                    actif.demarrer();</span>
+<span class="nc" id="L47">                } catch (Exception e) {</span>
+<span class="nc" id="L48">                    System.err.println(</span>
+<span class="nc" id="L49">                            &quot;Error starting asset &quot; + actif.getId() + &quot; for mission &quot; + id + &quot;: &quot; + e.getMessage());</span>
+<span class="fc" id="L50">                }</span>
+<span class="fc" id="L51">            }</span>
+<span class="fc" id="L52">            System.out.println(&quot;Mission &quot; + id + &quot; démarrée.&quot;);</span>
+<span class="nc" id="L53">        } catch (Exception e) {</span>
+<span class="nc" id="L54">            System.err.println(&quot;Error starting mission &quot; + id + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L55">            e.printStackTrace();</span>
+<span class="fc" id="L56">        }</span>
+<span class="fc" id="L57">    }</span>
 
     /**
      * Terminates the mission.
      */
     public void terminer() {
-<span class="nc" id="L44">        this.statut = StatutMission.TERMINEE;</span>
-<span class="nc bnc" id="L45" title="All 2 branches missed.">        for (ActifMobile actif : actifsAssignes) {</span>
-<span class="nc" id="L46">            actif.arreter(); // Or return to base</span>
-<span class="nc" id="L47">        }</span>
-<span class="nc" id="L48">        System.out.println(&quot;Mission &quot; + id + &quot; terminée.&quot;);</span>
-<span class="nc" id="L49">    }</span>
+        try {
+<span class="nc" id="L64">            this.statut = StatutMission.TERMINEE;</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            for (ActifMobile actif : actifsAssignes) {</span>
+                try {
+<span class="nc" id="L67">                    actif.arreter(); // Or return to base</span>
+<span class="nc" id="L68">                } catch (Exception e) {</span>
+<span class="nc" id="L69">                    System.err.println(</span>
+<span class="nc" id="L70">                            &quot;Error stopping asset &quot; + actif.getId() + &quot; for mission &quot; + id + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L71">                }</span>
+<span class="nc" id="L72">            }</span>
+<span class="nc" id="L73">            System.out.println(&quot;Mission &quot; + id + &quot; terminée.&quot;);</span>
+<span class="nc" id="L74">        } catch (Exception e) {</span>
+<span class="nc" id="L75">            System.err.println(&quot;Error terminating mission &quot; + id + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L76">            e.printStackTrace();</span>
+<span class="nc" id="L77">        }</span>
+<span class="nc" id="L78">    }</span>
 
     /**
      * Returns the current status of the mission.
@@ -54,7 +83,7 @@ public abstract class Mission {
      * @return The status of the mission.
      */
     public StatutMission getStatut() {
-<span class="nc" id="L57">        return statut;</span>
+<span class="nc" id="L86">        return statut;</span>
     }
 
     /**
@@ -63,7 +92,7 @@ public abstract class Mission {
      * @return The objective of the mission.
      */
     public ObjectifMission getObjectif() {
-<span class="fc" id="L66">        return objectif;</span>
+<span class="fc" id="L95">        return objectif;</span>
     }
 
     /**
@@ -72,7 +101,7 @@ public abstract class Mission {
      * @param objectif The new objective.
      */
     public void setObjectif(ObjectifMission objectif) {
-<span class="fc" id="L75">        this.objectif = objectif;</span>
-<span class="fc" id="L76">    }</span>
+<span class="fc" id="L104">        this.objectif = objectif;</span>
+<span class="fc" id="L105">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

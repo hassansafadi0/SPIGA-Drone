@@ -31,23 +31,28 @@ public class SimulationView extends Pane {
 
         // Handle Mouse Events
 <span class="nc" id="L33">        canvas.setOnMouseClicked(e -&gt; {</span>
-<span class="nc" id="L34">            double mx = e.getX();</span>
-<span class="nc" id="L35">            double my = e.getY();</span>
+            try {
+<span class="nc" id="L35">                double mx = e.getX();</span>
+<span class="nc" id="L36">                double my = e.getY();</span>
 
-<span class="nc bnc" id="L37" title="All 2 branches missed.">            if (e.getButton() == javafx.scene.input.MouseButton.PRIMARY) {</span>
-                // Try to select an asset
-<span class="nc" id="L39">                boolean clickedAsset = handleSelection(mx, my);</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">                if (e.getButton() == javafx.scene.input.MouseButton.PRIMARY) {</span>
+                    // Try to select an asset
+<span class="nc" id="L40">                    boolean clickedAsset = handleSelection(mx, my);</span>
 
-                // If we didn't click an asset, but have one selected, move it
-<span class="nc bnc" id="L42" title="All 4 branches missed.">                if (!clickedAsset &amp;&amp; !selectedAssets.isEmpty()) {</span>
-<span class="nc" id="L43">                    handleMoveCommand(mx, my);</span>
+                    // If we didn't click an asset, but have one selected, move it
+<span class="nc bnc" id="L43" title="All 4 branches missed.">                    if (!clickedAsset &amp;&amp; !selectedAssets.isEmpty()) {</span>
+<span class="nc" id="L44">                        handleMoveCommand(mx, my);</span>
+                    }
+<span class="nc bnc" id="L46" title="All 2 branches missed.">                } else if (e.getButton() == javafx.scene.input.MouseButton.SECONDARY) {</span>
+                    // Right click always moves if selected
+<span class="nc" id="L48">                    handleMoveCommand(mx, my);</span>
                 }
-<span class="nc bnc" id="L45" title="All 2 branches missed.">            } else if (e.getButton() == javafx.scene.input.MouseButton.SECONDARY) {</span>
-                // Right click always moves if selected
-<span class="nc" id="L47">                handleMoveCommand(mx, my);</span>
-            }
-<span class="nc" id="L49">        });</span>
-<span class="nc" id="L50">    }</span>
+<span class="nc" id="L50">            } catch (Exception ex) {</span>
+<span class="nc" id="L51">                System.err.println(&quot;Error handling mouse click: &quot; + ex.getMessage());</span>
+<span class="nc" id="L52">                ex.printStackTrace();</span>
+<span class="nc" id="L53">            }</span>
+<span class="nc" id="L54">        });</span>
+<span class="nc" id="L55">    }</span>
 
     private Runnable onUpdate;
 
@@ -57,65 +62,80 @@ public class SimulationView extends Pane {
      * @param onUpdate The runnable to execute.
      */
     public void setOnUpdate(Runnable onUpdate) {
-<span class="nc" id="L60">        this.onUpdate = onUpdate;</span>
-<span class="nc" id="L61">    }</span>
+<span class="nc" id="L65">        this.onUpdate = onUpdate;</span>
+<span class="nc" id="L66">    }</span>
 
-<span class="nc" id="L63">    private long lastUpdate = 0;</span>
+<span class="nc" id="L68">    private long lastUpdate = 0;</span>
 
     /**
      * Starts the simulation animation timer.
      */
     public void startSimulation() {
-<span class="nc" id="L69">        timer = new AnimationTimer() {</span>
+<span class="nc" id="L74">        timer = new AnimationTimer() {</span>
             @Override
             public void handle(long now) {
-<span class="nc bnc" id="L72" title="All 2 branches missed.">                if (now - lastUpdate &gt;= 100_000_000) { // Update every 100ms (10 FPS)</span>
-<span class="nc" id="L73">                    update();</span>
-<span class="nc" id="L74">                    draw();</span>
-<span class="nc bnc" id="L75" title="All 2 branches missed.">                    if (onUpdate != null) {</span>
-<span class="nc" id="L76">                        onUpdate.run();</span>
+                try {
+<span class="nc bnc" id="L78" title="All 2 branches missed.">                    if (now - lastUpdate &gt;= 100_000_000) { // Update every 100ms (10 FPS)</span>
+<span class="nc" id="L79">                        update();</span>
+<span class="nc" id="L80">                        draw();</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">                        if (onUpdate != null) {</span>
+<span class="nc" id="L82">                            onUpdate.run();</span>
+                        }
+<span class="nc" id="L84">                        lastUpdate = now;</span>
                     }
-<span class="nc" id="L78">                    lastUpdate = now;</span>
-                }
-<span class="nc" id="L80">            }</span>
+<span class="nc" id="L86">                } catch (Exception e) {</span>
+<span class="nc" id="L87">                    System.err.println(&quot;Error in animation timer: &quot; + e.getMessage());</span>
+<span class="nc" id="L88">                    e.printStackTrace();</span>
+<span class="nc" id="L89">                }</span>
+<span class="nc" id="L90">            }</span>
         };
-<span class="nc" id="L82">        timer.start();</span>
-<span class="nc" id="L83">    }</span>
+<span class="nc" id="L92">        timer.start();</span>
+<span class="nc" id="L93">    }</span>
 
     private boolean handleSelection(double mx, double my) {
-<span class="nc" id="L86">        boolean clickedOnAsset = false;</span>
-        // If CTRL is not held, clear selection (simplified logic: assume always
-        // multi-select or toggle)
-        // For now, let's implement simple toggle behavior
+        try {
+<span class="nc" id="L97">            boolean clickedOnAsset = false;</span>
+            // If CTRL is not held, clear selection (simplified logic: assume always
+            // multi-select or toggle)
+            // For now, let's implement simple toggle behavior
 
-<span class="nc bnc" id="L91" title="All 2 branches missed.">        for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
-            // Map world to canvas
-<span class="nc" id="L93">            double x = actif.getPosition().getX() * SCALE;</span>
-<span class="nc" id="L94">            double y = actif.getPosition().getY() * SCALE;</span>
-
-            // Simple hit detection (radius 20 for easier clicking)
-<span class="nc bnc" id="L97" title="All 4 branches missed.">            if (Math.abs(mx - x) &lt; 20 &amp;&amp; Math.abs(my - y) &lt; 20) {</span>
-<span class="nc bnc" id="L98" title="All 2 branches missed.">                if (selectedAssets.contains(actif)) {</span>
-<span class="nc" id="L99">                    selectedAssets.remove(actif);</span>
-<span class="nc" id="L100">                    System.out.println(&quot;Deselected: &quot; + actif.getId());</span>
-                } else {
-<span class="nc" id="L102">                    selectedAssets.add(actif);</span>
-<span class="nc" id="L103">                    System.out.println(&quot;Selected: &quot; + actif.getId());</span>
-                }
-<span class="nc" id="L105">                draw();</span>
-<span class="nc" id="L106">                clickedOnAsset = true;</span>
-<span class="nc" id="L107">                break; // Only select one at a time per click</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">            if (gestionnaire.getFlotte() == null) {</span>
+<span class="nc" id="L103">                return false;</span>
             }
-<span class="nc" id="L109">        }</span>
 
-        // If clicked on empty space, clear selection?
-<span class="nc bnc" id="L112" title="All 2 branches missed.">        if (!clickedOnAsset) {</span>
-            // Optional: Clear selection if clicking on empty space
-            // selectedAssets.clear();
-            // draw();
+<span class="nc bnc" id="L106" title="All 2 branches missed.">            for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
+                // Map world to canvas
+<span class="nc" id="L108">                double x = actif.getPosition().getX() * SCALE;</span>
+<span class="nc" id="L109">                double y = actif.getPosition().getY() * SCALE;</span>
+
+                // Simple hit detection (radius 20 for easier clicking)
+<span class="nc bnc" id="L112" title="All 4 branches missed.">                if (Math.abs(mx - x) &lt; 20 &amp;&amp; Math.abs(my - y) &lt; 20) {</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">                    if (selectedAssets.contains(actif)) {</span>
+<span class="nc" id="L114">                        selectedAssets.remove(actif);</span>
+<span class="nc" id="L115">                        System.out.println(&quot;Deselected: &quot; + actif.getId());</span>
+                    } else {
+<span class="nc" id="L117">                        selectedAssets.add(actif);</span>
+<span class="nc" id="L118">                        System.out.println(&quot;Selected: &quot; + actif.getId());</span>
+                    }
+<span class="nc" id="L120">                    draw();</span>
+<span class="nc" id="L121">                    clickedOnAsset = true;</span>
+<span class="nc" id="L122">                    break; // Only select one at a time per click</span>
+                }
+<span class="nc" id="L124">            }</span>
+
+            // If clicked on empty space, clear selection?
+<span class="nc bnc" id="L127" title="All 2 branches missed.">            if (!clickedOnAsset) {</span>
+                // Optional: Clear selection if clicking on empty space
+                // selectedAssets.clear();
+                // draw();
+            }
+
+<span class="nc" id="L133">            return clickedOnAsset;</span>
+<span class="nc" id="L134">        } catch (Exception e) {</span>
+<span class="nc" id="L135">            System.err.println(&quot;Error handling selection: &quot; + e.getMessage());</span>
+<span class="nc" id="L136">            e.printStackTrace();</span>
+<span class="nc" id="L137">            return false;</span>
         }
-
-<span class="nc" id="L118">        return clickedOnAsset;</span>
     }
 
     /**
@@ -126,148 +146,188 @@ public class SimulationView extends Pane {
      * @param my Mouse Y coordinate.
      */
     private void handleMoveCommand(double mx, double my) {
-<span class="nc bnc" id="L129" title="All 2 branches missed.">        if (selectedAssets.isEmpty())</span>
-<span class="nc" id="L130">            return;</span>
+        try {
+<span class="nc bnc" id="L150" title="All 2 branches missed.">            if (selectedAssets.isEmpty())</span>
+<span class="nc" id="L151">                return;</span>
 
-        // Map canvas back to world
-<span class="nc" id="L133">        double wx = mx / SCALE;</span>
-<span class="nc" id="L134">        double wy = my / SCALE;</span>
+            // Map canvas back to world
+<span class="nc" id="L154">            double wx = mx / SCALE;</span>
+<span class="nc" id="L155">            double wy = my / SCALE;</span>
 
-<span class="nc bnc" id="L136" title="All 2 branches missed.">        for (ActifMobile asset : selectedAssets) {</span>
-<span class="nc" id="L137">            double wz = asset.getPosition().getZ(); // Keep current altitude/depth</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">            for (ActifMobile asset : selectedAssets) {</span>
+                try {
+<span class="nc" id="L159">                    double wz = asset.getPosition().getZ(); // Keep current altitude/depth</span>
 
-            // Constraints
-            // 1. Marine assets cannot go on land
-<span class="nc bnc" id="L141" title="All 2 branches missed.">            if (asset instanceof com.spiga.core.ActifMarin) {</span>
-<span class="nc bnc" id="L142" title="All 2 branches missed.">                if (zone.isLand(new Point3D(wx, wy, 0))) {</span>
-<span class="nc" id="L143">                    System.out.println(&quot;Cannot move marine asset &quot; + asset.getId() + &quot; to land!&quot;);</span>
-<span class="nc" id="L144">                    continue;</span>
-                }
-            }
-            // 2. Land vehicles cannot go into water
-<span class="nc bnc" id="L148" title="All 2 branches missed.">            if (asset instanceof com.spiga.core.VehiculeTerrestre) {</span>
-<span class="nc bnc" id="L149" title="All 2 branches missed.">                if (!zone.isLand(new Point3D(wx, wy, 0))) {</span>
-<span class="nc" id="L150">                    System.out.println(&quot;Cannot move land vehicle &quot; + asset.getId() + &quot; to water!&quot;);</span>
-<span class="nc" id="L151">                    continue;</span>
-                }
-            }
+                    // Constraints
+                    // 1. Marine assets cannot go on land
+<span class="nc bnc" id="L163" title="All 2 branches missed.">                    if (asset instanceof com.spiga.core.ActifMarin) {</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">                        if (zone.isLand(new Point3D(wx, wy, 0))) {</span>
+<span class="nc" id="L165">                            System.out.println(&quot;Cannot move marine asset &quot; + asset.getId() + &quot; to land!&quot;);</span>
+<span class="nc" id="L166">                            continue;</span>
+                        }
+                    }
+                    // 2. Land vehicles cannot go into water
+<span class="nc bnc" id="L170" title="All 2 branches missed.">                    if (asset instanceof com.spiga.core.VehiculeTerrestre) {</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">                        if (!zone.isLand(new Point3D(wx, wy, 0))) {</span>
+<span class="nc" id="L172">                            System.out.println(&quot;Cannot move land vehicle &quot; + asset.getId() + &quot; to water!&quot;);</span>
+<span class="nc" id="L173">                            continue;</span>
+                        }
+                    }
 
-<span class="nc" id="L155">            asset.setTarget(new Point3D(wx, wy, wz));</span>
-<span class="nc" id="L156">            System.out.println(&quot;Moving &quot; + asset.getId() + &quot; to &quot; + wx + &quot;, &quot; + wy);</span>
-<span class="nc" id="L157">        }</span>
-<span class="nc" id="L158">    }</span>
+<span class="nc" id="L177">                    asset.setTarget(new Point3D(wx, wy, wz));</span>
+<span class="nc" id="L178">                    System.out.println(&quot;Moving &quot; + asset.getId() + &quot; to &quot; + wx + &quot;, &quot; + wy);</span>
+<span class="nc" id="L179">                } catch (Exception e) {</span>
+<span class="nc" id="L180">                    System.err.println(&quot;Error moving asset &quot; + asset.getId() + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L181">                }</span>
+<span class="nc" id="L182">            }</span>
+<span class="nc" id="L183">        } catch (Exception e) {</span>
+<span class="nc" id="L184">            System.err.println(&quot;Error handling move command: &quot; + e.getMessage());</span>
+<span class="nc" id="L185">            e.printStackTrace();</span>
+<span class="nc" id="L186">        }</span>
+<span class="nc" id="L187">    }</span>
 
     /**
      * Updates the state of all assets.
      * Moves assets towards their targets and checks for arrival.
      */
     private void update() {
-<span class="nc bnc" id="L165" title="All 2 branches missed.">        for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
-<span class="nc bnc" id="L166" title="All 2 branches missed.">            if (actif.getTarget() != null) {</span>
-<span class="nc" id="L167">                actif.deplacer(actif.getTarget(), zone);</span>
-
-                // Stop if reached (simple check)
-<span class="nc" id="L170">                double dx = actif.getTarget().getX() - actif.getPosition().getX();</span>
-<span class="nc" id="L171">                double dy = actif.getTarget().getY() - actif.getPosition().getY();</span>
-<span class="nc bnc" id="L172" title="All 2 branches missed.">                if (Math.sqrt(dx * dx + dy * dy) &lt; 5.0) { // Tolerance</span>
-<span class="nc" id="L173">                    actif.setTarget(null); // Stop</span>
-<span class="nc" id="L174">                    actif.setEtat(com.spiga.core.EtatOperationnel.AU_SOL); // Reset state</span>
-                }
+        try {
+<span class="nc bnc" id="L195" title="All 2 branches missed.">            if (gestionnaire.getFlotte() == null) {</span>
+<span class="nc" id="L196">                return;</span>
             }
-<span class="nc" id="L177">        }</span>
-<span class="nc" id="L178">    }</span>
+
+<span class="nc bnc" id="L199" title="All 2 branches missed.">            for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
+                try {
+<span class="nc bnc" id="L201" title="All 2 branches missed.">                    if (actif.getTarget() != null) {</span>
+<span class="nc" id="L202">                        actif.deplacer(actif.getTarget(), zone);</span>
+
+                        // Stop if reached (simple check)
+<span class="nc" id="L205">                        double dx = actif.getTarget().getX() - actif.getPosition().getX();</span>
+<span class="nc" id="L206">                        double dy = actif.getTarget().getY() - actif.getPosition().getY();</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">                        if (Math.sqrt(dx * dx + dy * dy) &lt; 5.0) { // Tolerance</span>
+<span class="nc" id="L208">                            actif.setTarget(null); // Stop</span>
+<span class="nc" id="L209">                            actif.setEtat(com.spiga.core.EtatOperationnel.AU_SOL); // Reset state</span>
+                        }
+                    }
+<span class="nc" id="L212">                } catch (Exception e) {</span>
+<span class="nc" id="L213">                    System.err.println(&quot;Error updating asset &quot; + actif.getId() + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L214">                }</span>
+<span class="nc" id="L215">            }</span>
+<span class="nc" id="L216">        } catch (Exception e) {</span>
+<span class="nc" id="L217">            System.err.println(&quot;Error in update loop: &quot; + e.getMessage());</span>
+<span class="nc" id="L218">            e.printStackTrace();</span>
+<span class="nc" id="L219">        }</span>
+<span class="nc" id="L220">    }</span>
 
     /**
      * Draws the simulation state on the canvas.
      * Renders the map (water, islands) and assets.
      */
     private void draw() {
-<span class="nc" id="L185">        GraphicsContext gc = canvas.getGraphicsContext2D();</span>
+        try {
+<span class="nc" id="L228">            GraphicsContext gc = canvas.getGraphicsContext2D();</span>
 
-        // Clear background (Water)
-<span class="nc" id="L188">        gc.setFill(Color.LIGHTBLUE);</span>
-<span class="nc" id="L189">        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());</span>
+            // Clear background (Water)
+<span class="nc" id="L231">            gc.setFill(Color.LIGHTBLUE);</span>
+<span class="nc" id="L232">            gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());</span>
 
-        // Draw Islands
-<span class="nc" id="L192">        gc.setFill(Color.LIGHTGREEN);</span>
-<span class="nc bnc" id="L193" title="All 2 branches missed.">        for (ZoneOperation.Island island : zone.getIslands()) {</span>
-<span class="nc bnc" id="L194" title="All 2 branches missed.">            if (island.isCircle()) {</span>
-<span class="nc" id="L195">                gc.fillOval(island.getX() * SCALE - (island.getW() * SCALE),</span>
-<span class="nc" id="L196">                        island.getY() * SCALE - (island.getW() * SCALE),</span>
-<span class="nc" id="L197">                        island.getW() * SCALE * 2, island.getW() * SCALE * 2);</span>
-            } else {
-<span class="nc" id="L199">                gc.fillRect(island.getX() * SCALE, island.getY() * SCALE, island.getW() * SCALE, island.getH() * SCALE);</span>
+            // Draw Islands
+<span class="nc" id="L235">            gc.setFill(Color.LIGHTGREEN);</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">            if (zone.getIslands() != null) {</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">                for (ZoneOperation.Island island : zone.getIslands()) {</span>
+                    try {
+<span class="nc bnc" id="L239" title="All 2 branches missed.">                        if (island.isCircle()) {</span>
+<span class="nc" id="L240">                            gc.fillOval(island.getX() * SCALE - (island.getW() * SCALE),</span>
+<span class="nc" id="L241">                                    island.getY() * SCALE - (island.getW() * SCALE),</span>
+<span class="nc" id="L242">                                    island.getW() * SCALE * 2, island.getW() * SCALE * 2);</span>
+                        } else {
+<span class="nc" id="L244">                            gc.fillRect(island.getX() * SCALE, island.getY() * SCALE, island.getW() * SCALE,</span>
+<span class="nc" id="L245">                                    island.getH() * SCALE);</span>
+                        }
+<span class="nc" id="L247">                    } catch (Exception e) {</span>
+<span class="nc" id="L248">                        System.err.println(&quot;Error drawing island: &quot; + e.getMessage());</span>
+<span class="nc" id="L249">                    }</span>
+<span class="nc" id="L250">                }</span>
             }
-<span class="nc" id="L201">        }</span>
 
-        // Draw Assets
-<span class="nc bnc" id="L204" title="All 2 branches missed.">        for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
-<span class="nc" id="L205">            drawAsset(gc, actif);</span>
-<span class="nc" id="L206">        }</span>
-<span class="nc" id="L207">    }</span>
+            // Draw Assets
+<span class="nc bnc" id="L254" title="All 2 branches missed.">            if (gestionnaire.getFlotte() != null) {</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">                for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
+                    try {
+<span class="nc" id="L257">                        drawAsset(gc, actif);</span>
+<span class="nc" id="L258">                    } catch (Exception e) {</span>
+<span class="nc" id="L259">                        System.err.println(&quot;Error drawing asset &quot; + actif.getId() + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L260">                    }</span>
+<span class="nc" id="L261">                }</span>
+            }
+<span class="nc" id="L263">        } catch (Exception e) {</span>
+<span class="nc" id="L264">            System.err.println(&quot;Error in draw method: &quot; + e.getMessage());</span>
+<span class="nc" id="L265">            e.printStackTrace();</span>
+<span class="nc" id="L266">        }</span>
+<span class="nc" id="L267">    }</span>
 
     private void drawAsset(GraphicsContext gc, ActifMobile actif) {
-<span class="nc" id="L210">        double x = actif.getPosition().getX() * SCALE;</span>
-<span class="nc" id="L211">        double y = actif.getPosition().getY() * SCALE;</span>
-<span class="nc" id="L212">        String type = actif.getClass().getSimpleName();</span>
+<span class="nc" id="L270">        double x = actif.getPosition().getX() * SCALE;</span>
+<span class="nc" id="L271">        double y = actif.getPosition().getY() * SCALE;</span>
+<span class="nc" id="L272">        String type = actif.getClass().getSimpleName();</span>
 
-<span class="nc" id="L214">        gc.setFill(getColorForType(actif));</span>
+<span class="nc" id="L274">        gc.setFill(getColorForType(actif));</span>
 
-<span class="nc bnc" id="L216" title="All 2 branches missed.">        if (selectedAssets.contains(actif)) {</span>
-<span class="nc" id="L217">            gc.setStroke(Color.RED);</span>
-<span class="nc" id="L218">            gc.setLineWidth(2);</span>
-<span class="nc" id="L219">            gc.strokeOval(x - 15, y - 15, 30, 30);</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">        if (selectedAssets.contains(actif)) {</span>
+<span class="nc" id="L277">            gc.setStroke(Color.RED);</span>
+<span class="nc" id="L278">            gc.setLineWidth(2);</span>
+<span class="nc" id="L279">            gc.strokeOval(x - 15, y - 15, 30, 30);</span>
         }
 
-<span class="nc bnc" id="L222" title="All 2 branches missed.">        if (type.contains(&quot;Reconnaissance&quot;)) {</span>
+<span class="nc bnc" id="L282" title="All 2 branches missed.">        if (type.contains(&quot;Reconnaissance&quot;)) {</span>
             // Triangle for plane
-<span class="nc" id="L224">            gc.fillPolygon(new double[] { x, x - 10, x + 10 }, new double[] { y - 10, y + 10, y + 10 }, 3);</span>
-<span class="nc bnc" id="L225" title="All 2 branches missed.">        } else if (type.contains(&quot;Logistique&quot;)) {</span>
+<span class="nc" id="L284">            gc.fillPolygon(new double[] { x, x - 10, x + 10 }, new double[] { y - 10, y + 10, y + 10 }, 3);</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">        } else if (type.contains(&quot;Logistique&quot;)) {</span>
             // Square/Quad for drone
-<span class="nc" id="L227">            gc.fillRect(x - 8, y - 8, 16, 16);</span>
+<span class="nc" id="L287">            gc.fillRect(x - 8, y - 8, 16, 16);</span>
             // Rotors
-<span class="nc" id="L229">            gc.setStroke(Color.BLACK);</span>
-<span class="nc" id="L230">            gc.strokeOval(x - 12, y - 12, 10, 10);</span>
-<span class="nc" id="L231">            gc.strokeOval(x + 2, y - 12, 10, 10);</span>
-<span class="nc" id="L232">            gc.strokeOval(x - 12, y + 2, 10, 10);</span>
-<span class="nc" id="L233">            gc.strokeOval(x + 2, y + 2, 10, 10);</span>
-<span class="nc bnc" id="L234" title="All 2 branches missed.">        } else if (type.contains(&quot;Surface&quot;)) {</span>
+<span class="nc" id="L289">            gc.setStroke(Color.BLACK);</span>
+<span class="nc" id="L290">            gc.strokeOval(x - 12, y - 12, 10, 10);</span>
+<span class="nc" id="L291">            gc.strokeOval(x + 2, y - 12, 10, 10);</span>
+<span class="nc" id="L292">            gc.strokeOval(x - 12, y + 2, 10, 10);</span>
+<span class="nc" id="L293">            gc.strokeOval(x + 2, y + 2, 10, 10);</span>
+<span class="nc bnc" id="L294" title="All 2 branches missed.">        } else if (type.contains(&quot;Surface&quot;)) {</span>
             // Boat shape
-<span class="nc" id="L236">            gc.fillPolygon(new double[] { x - 12, x + 12, x + 6, x - 6 }, new double[] { y - 6, y - 6, y + 6, y + 6 },</span>
+<span class="nc" id="L296">            gc.fillPolygon(new double[] { x - 12, x + 12, x + 6, x - 6 }, new double[] { y - 6, y - 6, y + 6, y + 6 },</span>
                     4);
-<span class="nc bnc" id="L238" title="All 2 branches missed.">        } else if (type.contains(&quot;SousMarin&quot;)) {</span>
+<span class="nc bnc" id="L298" title="All 2 branches missed.">        } else if (type.contains(&quot;SousMarin&quot;)) {</span>
             // Ellipse for sub
-<span class="nc" id="L240">            gc.fillOval(x - 14, y - 7, 28, 14);</span>
+<span class="nc" id="L300">            gc.fillOval(x - 14, y - 7, 28, 14);</span>
             // Periscope
-<span class="nc" id="L242">            gc.strokeLine(x, y - 7, x, y - 14);</span>
-<span class="nc bnc" id="L243" title="All 2 branches missed.">        } else if (type.contains(&quot;Terrestre&quot;)) {</span>
+<span class="nc" id="L302">            gc.strokeLine(x, y - 7, x, y - 14);</span>
+<span class="nc bnc" id="L303" title="All 2 branches missed.">        } else if (type.contains(&quot;Terrestre&quot;)) {</span>
             // Car shape (Rectangle)
-<span class="nc" id="L245">            gc.fillRect(x - 10, y - 6, 20, 12);</span>
+<span class="nc" id="L305">            gc.fillRect(x - 10, y - 6, 20, 12);</span>
             // Wheels
-<span class="nc" id="L247">            gc.setFill(Color.BLACK);</span>
-<span class="nc" id="L248">            gc.fillOval(x - 8, y + 6, 4, 4);</span>
-<span class="nc" id="L249">            gc.fillOval(x + 4, y + 6, 4, 4);</span>
-<span class="nc" id="L250">            gc.fillOval(x - 8, y - 8, 4, 4);</span>
-<span class="nc" id="L251">            gc.fillOval(x + 4, y - 8, 4, 4);</span>
+<span class="nc" id="L307">            gc.setFill(Color.BLACK);</span>
+<span class="nc" id="L308">            gc.fillOval(x - 8, y + 6, 4, 4);</span>
+<span class="nc" id="L309">            gc.fillOval(x + 4, y + 6, 4, 4);</span>
+<span class="nc" id="L310">            gc.fillOval(x - 8, y - 8, 4, 4);</span>
+<span class="nc" id="L311">            gc.fillOval(x + 4, y - 8, 4, 4);</span>
         } else {
-<span class="nc" id="L253">            gc.fillOval(x - 5, y - 5, 10, 10);</span>
+<span class="nc" id="L313">            gc.fillOval(x - 5, y - 5, 10, 10);</span>
         }
 
-<span class="nc" id="L256">        gc.setFill(Color.BLACK);</span>
-<span class="nc" id="L257">        gc.fillText(actif.getId(), x + 12, y);</span>
-<span class="nc" id="L258">    }</span>
+<span class="nc" id="L316">        gc.setFill(Color.BLACK);</span>
+<span class="nc" id="L317">        gc.fillText(actif.getId(), x + 12, y);</span>
+<span class="nc" id="L318">    }</span>
 
     private Color getColorForType(ActifMobile actif) {
-<span class="nc" id="L261">        String type = actif.getClass().getSimpleName();</span>
-<span class="nc bnc" id="L262" title="All 2 branches missed.">        if (type.contains(&quot;Reconnaissance&quot;))</span>
-<span class="nc" id="L263">            return Color.BLUE;</span>
-<span class="nc bnc" id="L264" title="All 2 branches missed.">        if (type.contains(&quot;Logistique&quot;))</span>
-<span class="nc" id="L265">            return Color.GREEN;</span>
-<span class="nc bnc" id="L266" title="All 2 branches missed.">        if (type.contains(&quot;Surface&quot;))</span>
-<span class="nc" id="L267">            return Color.ORANGE;</span>
-<span class="nc bnc" id="L268" title="All 2 branches missed.">        if (type.contains(&quot;SousMarin&quot;))</span>
-<span class="nc" id="L269">            return Color.DARKBLUE;</span>
-<span class="nc" id="L270">        return Color.RED;</span>
+<span class="nc" id="L321">        String type = actif.getClass().getSimpleName();</span>
+<span class="nc bnc" id="L322" title="All 2 branches missed.">        if (type.contains(&quot;Reconnaissance&quot;))</span>
+<span class="nc" id="L323">            return Color.BLUE;</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">        if (type.contains(&quot;Logistique&quot;))</span>
+<span class="nc" id="L325">            return Color.GREEN;</span>
+<span class="nc bnc" id="L326" title="All 2 branches missed.">        if (type.contains(&quot;Surface&quot;))</span>
+<span class="nc" id="L327">            return Color.ORANGE;</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">        if (type.contains(&quot;SousMarin&quot;))</span>
+<span class="nc" id="L329">            return Color.DARKBLUE;</span>
+<span class="nc" id="L330">        return Color.RED;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

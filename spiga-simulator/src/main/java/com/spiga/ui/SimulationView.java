@@ -31,20 +31,25 @@ public class SimulationView extends Pane {
 
         // Handle Mouse Events
         canvas.setOnMouseClicked(e -> {
-            double mx = e.getX();
-            double my = e.getY();
+            try {
+                double mx = e.getX();
+                double my = e.getY();
 
-            if (e.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
-                // Try to select an asset
-                boolean clickedAsset = handleSelection(mx, my);
+                if (e.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+                    // Try to select an asset
+                    boolean clickedAsset = handleSelection(mx, my);
 
-                // If we didn't click an asset, but have one selected, move it
-                if (!clickedAsset && !selectedAssets.isEmpty()) {
+                    // If we didn't click an asset, but have one selected, move it
+                    if (!clickedAsset && !selectedAssets.isEmpty()) {
+                        handleMoveCommand(mx, my);
+                    }
+                } else if (e.getButton() == javafx.scene.input.MouseButton.SECONDARY) {
+                    // Right click always moves if selected
                     handleMoveCommand(mx, my);
                 }
-            } else if (e.getButton() == javafx.scene.input.MouseButton.SECONDARY) {
-                // Right click always moves if selected
-                handleMoveCommand(mx, my);
+            } catch (Exception ex) {
+                System.err.println("Error handling mouse click: " + ex.getMessage());
+                ex.printStackTrace();
             }
         });
     }
@@ -69,13 +74,18 @@ public class SimulationView extends Pane {
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (now - lastUpdate >= 100_000_000) { // Update every 100ms (10 FPS)
-                    update();
-                    draw();
-                    if (onUpdate != null) {
-                        onUpdate.run();
+                try {
+                    if (now - lastUpdate >= 100_000_000) { // Update every 100ms (10 FPS)
+                        update();
+                        draw();
+                        if (onUpdate != null) {
+                            onUpdate.run();
+                        }
+                        lastUpdate = now;
                     }
-                    lastUpdate = now;
+                } catch (Exception e) {
+                    System.err.println("Error in animation timer: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         };
@@ -83,39 +93,49 @@ public class SimulationView extends Pane {
     }
 
     private boolean handleSelection(double mx, double my) {
-        boolean clickedOnAsset = false;
-        // If CTRL is not held, clear selection (simplified logic: assume always
-        // multi-select or toggle)
-        // For now, let's implement simple toggle behavior
+        try {
+            boolean clickedOnAsset = false;
+            // If CTRL is not held, clear selection (simplified logic: assume always
+            // multi-select or toggle)
+            // For now, let's implement simple toggle behavior
 
-        for (ActifMobile actif : gestionnaire.getFlotte()) {
-            // Map world to canvas
-            double x = actif.getPosition().getX() * SCALE;
-            double y = actif.getPosition().getY() * SCALE;
-
-            // Simple hit detection (radius 20 for easier clicking)
-            if (Math.abs(mx - x) < 20 && Math.abs(my - y) < 20) {
-                if (selectedAssets.contains(actif)) {
-                    selectedAssets.remove(actif);
-                    System.out.println("Deselected: " + actif.getId());
-                } else {
-                    selectedAssets.add(actif);
-                    System.out.println("Selected: " + actif.getId());
-                }
-                draw();
-                clickedOnAsset = true;
-                break; // Only select one at a time per click
+            if (gestionnaire.getFlotte() == null) {
+                return false;
             }
-        }
 
-        // If clicked on empty space, clear selection?
-        if (!clickedOnAsset) {
-            // Optional: Clear selection if clicking on empty space
-            // selectedAssets.clear();
-            // draw();
-        }
+            for (ActifMobile actif : gestionnaire.getFlotte()) {
+                // Map world to canvas
+                double x = actif.getPosition().getX() * SCALE;
+                double y = actif.getPosition().getY() * SCALE;
 
-        return clickedOnAsset;
+                // Simple hit detection (radius 20 for easier clicking)
+                if (Math.abs(mx - x) < 20 && Math.abs(my - y) < 20) {
+                    if (selectedAssets.contains(actif)) {
+                        selectedAssets.remove(actif);
+                        System.out.println("Deselected: " + actif.getId());
+                    } else {
+                        selectedAssets.add(actif);
+                        System.out.println("Selected: " + actif.getId());
+                    }
+                    draw();
+                    clickedOnAsset = true;
+                    break; // Only select one at a time per click
+                }
+            }
+
+            // If clicked on empty space, clear selection?
+            if (!clickedOnAsset) {
+                // Optional: Clear selection if clicking on empty space
+                // selectedAssets.clear();
+                // draw();
+            }
+
+            return clickedOnAsset;
+        } catch (Exception e) {
+            System.err.println("Error handling selection: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -126,34 +146,43 @@ public class SimulationView extends Pane {
      * @param my Mouse Y coordinate.
      */
     private void handleMoveCommand(double mx, double my) {
-        if (selectedAssets.isEmpty())
-            return;
+        try {
+            if (selectedAssets.isEmpty())
+                return;
 
-        // Map canvas back to world
-        double wx = mx / SCALE;
-        double wy = my / SCALE;
+            // Map canvas back to world
+            double wx = mx / SCALE;
+            double wy = my / SCALE;
 
-        for (ActifMobile asset : selectedAssets) {
-            double wz = asset.getPosition().getZ(); // Keep current altitude/depth
+            for (ActifMobile asset : selectedAssets) {
+                try {
+                    double wz = asset.getPosition().getZ(); // Keep current altitude/depth
 
-            // Constraints
-            // 1. Marine assets cannot go on land
-            if (asset instanceof com.spiga.core.ActifMarin) {
-                if (zone.isLand(new Point3D(wx, wy, 0))) {
-                    System.out.println("Cannot move marine asset " + asset.getId() + " to land!");
-                    continue;
+                    // Constraints
+                    // 1. Marine assets cannot go on land
+                    if (asset instanceof com.spiga.core.ActifMarin) {
+                        if (zone.isLand(new Point3D(wx, wy, 0))) {
+                            System.out.println("Cannot move marine asset " + asset.getId() + " to land!");
+                            continue;
+                        }
+                    }
+                    // 2. Land vehicles cannot go into water
+                    if (asset instanceof com.spiga.core.VehiculeTerrestre) {
+                        if (!zone.isLand(new Point3D(wx, wy, 0))) {
+                            System.out.println("Cannot move land vehicle " + asset.getId() + " to water!");
+                            continue;
+                        }
+                    }
+
+                    asset.setTarget(new Point3D(wx, wy, wz));
+                    System.out.println("Moving " + asset.getId() + " to " + wx + ", " + wy);
+                } catch (Exception e) {
+                    System.err.println("Error moving asset " + asset.getId() + ": " + e.getMessage());
                 }
             }
-            // 2. Land vehicles cannot go into water
-            if (asset instanceof com.spiga.core.VehiculeTerrestre) {
-                if (!zone.isLand(new Point3D(wx, wy, 0))) {
-                    System.out.println("Cannot move land vehicle " + asset.getId() + " to water!");
-                    continue;
-                }
-            }
-
-            asset.setTarget(new Point3D(wx, wy, wz));
-            System.out.println("Moving " + asset.getId() + " to " + wx + ", " + wy);
+        } catch (Exception e) {
+            System.err.println("Error handling move command: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -162,18 +191,31 @@ public class SimulationView extends Pane {
      * Moves assets towards their targets and checks for arrival.
      */
     private void update() {
-        for (ActifMobile actif : gestionnaire.getFlotte()) {
-            if (actif.getTarget() != null) {
-                actif.deplacer(actif.getTarget(), zone);
+        try {
+            if (gestionnaire.getFlotte() == null) {
+                return;
+            }
 
-                // Stop if reached (simple check)
-                double dx = actif.getTarget().getX() - actif.getPosition().getX();
-                double dy = actif.getTarget().getY() - actif.getPosition().getY();
-                if (Math.sqrt(dx * dx + dy * dy) < 5.0) { // Tolerance
-                    actif.setTarget(null); // Stop
-                    actif.setEtat(com.spiga.core.EtatOperationnel.AU_SOL); // Reset state
+            for (ActifMobile actif : gestionnaire.getFlotte()) {
+                try {
+                    if (actif.getTarget() != null) {
+                        actif.deplacer(actif.getTarget(), zone);
+
+                        // Stop if reached (simple check)
+                        double dx = actif.getTarget().getX() - actif.getPosition().getX();
+                        double dy = actif.getTarget().getY() - actif.getPosition().getY();
+                        if (Math.sqrt(dx * dx + dy * dy) < 5.0) { // Tolerance
+                            actif.setTarget(null); // Stop
+                            actif.setEtat(com.spiga.core.EtatOperationnel.AU_SOL); // Reset state
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error updating asset " + actif.getId() + ": " + e.getMessage());
                 }
             }
+        } catch (Exception e) {
+            System.err.println("Error in update loop: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -182,27 +224,45 @@ public class SimulationView extends Pane {
      * Renders the map (water, islands) and assets.
      */
     private void draw() {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+        try {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        // Clear background (Water)
-        gc.setFill(Color.LIGHTBLUE);
-        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            // Clear background (Water)
+            gc.setFill(Color.LIGHTBLUE);
+            gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Draw Islands
-        gc.setFill(Color.LIGHTGREEN);
-        for (ZoneOperation.Island island : zone.getIslands()) {
-            if (island.isCircle()) {
-                gc.fillOval(island.getX() * SCALE - (island.getW() * SCALE),
-                        island.getY() * SCALE - (island.getW() * SCALE),
-                        island.getW() * SCALE * 2, island.getW() * SCALE * 2);
-            } else {
-                gc.fillRect(island.getX() * SCALE, island.getY() * SCALE, island.getW() * SCALE, island.getH() * SCALE);
+            // Draw Islands
+            gc.setFill(Color.LIGHTGREEN);
+            if (zone.getIslands() != null) {
+                for (ZoneOperation.Island island : zone.getIslands()) {
+                    try {
+                        if (island.isCircle()) {
+                            gc.fillOval(island.getX() * SCALE - (island.getW() * SCALE),
+                                    island.getY() * SCALE - (island.getW() * SCALE),
+                                    island.getW() * SCALE * 2, island.getW() * SCALE * 2);
+                        } else {
+                            gc.fillRect(island.getX() * SCALE, island.getY() * SCALE, island.getW() * SCALE,
+                                    island.getH() * SCALE);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error drawing island: " + e.getMessage());
+                    }
+                }
             }
-        }
 
-        // Draw Assets
-        for (ActifMobile actif : gestionnaire.getFlotte()) {
-            drawAsset(gc, actif);
+            // Draw Assets
+            if (gestionnaire.getFlotte() != null) {
+                for (ActifMobile actif : gestionnaire.getFlotte()) {
+                    try {
+                        drawAsset(gc, actif);
+                    } catch (Exception e) {
+                        System.err.println("Error drawing asset " + actif.getId() + ": " + e.getMessage());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error in draw method: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

@@ -68,91 +68,103 @@ public class VehiculeTerrestre extends ActifMobile {
      */
     @Override
     public void deplacer(Point3D cible, ZoneOperation zone) {
-        if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() <= 0) {
-            return;
-        }
-
-        if (getEtat() == EtatOperationnel.AU_SOL) {
-            setEtat(EtatOperationnel.EN_MISSION);
-        }
-
-        // Pathfinding Logic
-        if (getCurrentPath().isEmpty()) {
-            // Calculate path if empty
-            List<Point3D> path = zone.findPath(getPosition(), cible, false); // false = isLand (not Marine)
-            setCurrentPath(path);
-        }
-
-        // Get next waypoint
-        Point3D nextPoint = cible;
-        if (!getCurrentPath().isEmpty()) {
-            nextPoint = getCurrentPath().get(0);
-        }
-
-        // Simple movement logic on ground (2D)
-        double dx = nextPoint.getX() - getPosition().getX();
-        double dy = nextPoint.getY() - getPosition().getY();
-        // Ignore Z difference for movement direction, we stay on ground
-
-        double distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 5.0) { // Reached waypoint
-            if (!getCurrentPath().isEmpty()) {
-                getCurrentPath().remove(0); // Remove reached point
-                if (getCurrentPath().isEmpty())
-                    return; // Reached final target
+        try {
+            if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() <= 0) {
                 return;
             }
-        }
 
-        double nx = dx / distance;
-        double ny = dy / distance;
+            if (getEtat() == EtatOperationnel.AU_SOL) {
+                setEtat(EtatOperationnel.EN_MISSION);
+            }
 
-        double speed = getVitesseMax();
-        if (speed > distance) {
-            speed = distance;
-        }
+            // Pathfinding Logic
+            if (getCurrentPath().isEmpty()) {
+                // Calculate path if empty
+                List<Point3D> path = zone.findPath(getPosition(), cible, false); // false = isLand (not Marine)
+                setCurrentPath(path);
+            }
 
-        double moveX = nx * speed;
-        double moveY = ny * speed;
+            // Get next waypoint
+            Point3D nextPoint = cible;
+            if (!getCurrentPath().isEmpty()) {
+                nextPoint = getCurrentPath().get(0);
+            }
 
-        Point3D newPos = new Point3D(
-                getPosition().getX() + moveX,
-                getPosition().getY() + moveY,
-                0 // Stay on ground
-        );
+            // Simple movement logic on ground (2D)
+            double dx = nextPoint.getX() - getPosition().getX();
+            double dy = nextPoint.getY() - getPosition().getY();
+            // Ignore Z difference for movement direction, we stay on ground
 
-        if (!zone.isInside(newPos)) {
-            return;
-        }
-        if (zone.isCollision(newPos, this)) {
-            notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);
-            return;
-        }
+            double distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Check Water Collision (for Land Vehicle)
-        if (!zone.isLand(newPos)) {
-            // System.out.println("Car hit water!");
-            return;
-        }
+            if (distance < 5.0) { // Reached waypoint
+                if (!getCurrentPath().isEmpty()) {
+                    getCurrentPath().remove(0); // Remove reached point
+                    if (getCurrentPath().isEmpty())
+                        return; // Reached final target
+                    return;
+                }
+            }
 
-        setPosition(newPos);
+            double nx = dx / distance;
+            double ny = dy / distance;
 
-        // Consumption
-        double consumption = 1.0;
-        setAutonomieActuelle(getAutonomieActuelle() - consumption);
-        if (getAutonomieActuelle() <= 0) {
-            setAutonomieActuelle(0);
+            double speed = getVitesseMax();
+            if (speed > distance) {
+                speed = distance;
+            }
+
+            double moveX = nx * speed;
+            double moveY = ny * speed;
+
+            Point3D newPos = new Point3D(
+                    getPosition().getX() + moveX,
+                    getPosition().getY() + moveY,
+                    0 // Stay on ground
+            );
+
+            if (!zone.isInside(newPos)) {
+                return;
+            }
+            if (zone.isCollision(newPos, this)) {
+                notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);
+                return;
+            }
+
+            // Check Water Collision (for Land Vehicle)
+            if (!zone.isLand(newPos)) {
+                // System.out.println("Car hit water!");
+                return;
+            }
+
+            setPosition(newPos);
+
+            // Consumption
+            double consumption = 1.0;
+            setAutonomieActuelle(getAutonomieActuelle() - consumption);
+            if (getAutonomieActuelle() <= 0) {
+                setAutonomieActuelle(0);
+                setEtat(EtatOperationnel.EN_PANNE);
+                notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);
+            }
+        } catch (Exception e) {
+            System.err.println("Error moving land vehicle " + getId() + ": " + e.getMessage());
+            e.printStackTrace();
             setEtat(EtatOperationnel.EN_PANNE);
-            notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);
         }
     }
 
     @Override
     public List<Point3D> calculerTrajet(Point3D cible) {
-        List<Point3D> path = new ArrayList<>();
-        path.add(getPosition());
-        path.add(cible);
-        return path;
+        try {
+            List<Point3D> path = new ArrayList<>();
+            path.add(getPosition());
+            path.add(cible);
+            return path;
+        } catch (Exception e) {
+            System.err.println("Error calculating path for " + getId() + ": " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 }

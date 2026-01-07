@@ -182,33 +182,47 @@ public class ZoneOperation {
      * @return True if a collision is detected, false otherwise.
      */
     public boolean isCollision(Point3D point, Collidable ignoreMe) {
-        // Check static obstacles
-        for (Obstacle obs : obstacles) {
-            if (obs.contains(point)) {
-                return true;
-            }
-        }
-
-        // Check dynamic collidables (vehicles)
-        for (Collidable c : collidables) {
-            if (c == ignoreMe)
-                continue;
-
-            // Check if at same Z level (with small tolerance)
-            if (Math.abs(c.getPosition().getZ() - point.getZ()) < 0.1) {
-                double dist = Math.sqrt(
-                        Math.pow(c.getPosition().getX() - point.getX(), 2) +
-                                Math.pow(c.getPosition().getY() - point.getY(), 2));
-
-                // Assume default radius for the point being checked if not provided
-                double myRadius = (ignoreMe != null) ? ignoreMe.getRadius() : 5.0;
-
-                if (dist < (c.getRadius() + myRadius)) {
-                    return true;
+        try {
+            // Check static obstacles
+            for (Obstacle obs : obstacles) {
+                try {
+                    if (obs.contains(point)) {
+                        return true;
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error checking obstacle collision: " + e.getMessage());
                 }
             }
+
+            // Check dynamic collidables (vehicles)
+            for (Collidable c : collidables) {
+                try {
+                    if (c == ignoreMe)
+                        continue;
+
+                    // Check if at same Z level (with small tolerance)
+                    if (Math.abs(c.getPosition().getZ() - point.getZ()) < 0.1) {
+                        double dist = Math.sqrt(
+                                Math.pow(c.getPosition().getX() - point.getX(), 2) +
+                                        Math.pow(c.getPosition().getY() - point.getY(), 2));
+
+                        // Assume default radius for the point being checked if not provided
+                        double myRadius = (ignoreMe != null) ? ignoreMe.getRadius() : 5.0;
+
+                        if (dist < (c.getRadius() + myRadius)) {
+                            return true;
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error checking collidable collision: " + e.getMessage());
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            System.err.println("Error in collision detection: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     /**
@@ -218,9 +232,15 @@ public class ZoneOperation {
      * @return True if inside, false otherwise.
      */
     public boolean isInside(Point3D point) {
-        return point.getX() >= minCoord.getX() && point.getX() <= maxCoord.getX() &&
-                point.getY() >= minCoord.getY() && point.getY() <= maxCoord.getY() &&
-                point.getZ() >= minCoord.getZ() && point.getZ() <= maxCoord.getZ();
+        try {
+            return point.getX() >= minCoord.getX() && point.getX() <= maxCoord.getX() &&
+                    point.getY() >= minCoord.getY() && point.getY() <= maxCoord.getY() &&
+                    point.getZ() >= minCoord.getZ() && point.getZ() <= maxCoord.getZ();
+        } catch (Exception e) {
+            System.err.println("Error checking if point is inside zone: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     // A* Pathfinding
@@ -234,72 +254,81 @@ public class ZoneOperation {
      * @return A list of points representing the path.
      */
     public List<Point3D> findPath(Point3D start, Point3D end, boolean isMarine) {
-        // Simple grid-based A*
-        Node startNode = new Node((int) (start.getX() / 20), (int) (start.getY() / 20));
-        Node endNode = new Node((int) (end.getX() / 20), (int) (end.getY() / 20));
+        try {
+            // Simple grid-based A*
+            Node startNode = new Node((int) (start.getX() / 20), (int) (start.getY() / 20));
+            Node endNode = new Node((int) (end.getX() / 20), (int) (end.getY() / 20));
 
-        java.util.PriorityQueue<Node> openSet = new java.util.PriorityQueue<>(
-                java.util.Comparator.comparingDouble(n -> n.f));
-        java.util.Set<String> closedSet = new java.util.HashSet<>();
-        java.util.Map<String, Node> allNodes = new java.util.HashMap<>();
+            java.util.PriorityQueue<Node> openSet = new java.util.PriorityQueue<>(
+                    java.util.Comparator.comparingDouble(n -> n.f));
+            java.util.Set<String> closedSet = new java.util.HashSet<>();
+            java.util.Map<String, Node> allNodes = new java.util.HashMap<>();
 
-        startNode.g = 0;
-        startNode.h = heuristic(startNode, endNode);
-        startNode.f = startNode.g + startNode.h;
-        openSet.add(startNode);
-        allNodes.put(startNode.key(), startNode);
+            startNode.g = 0;
+            startNode.h = heuristic(startNode, endNode);
+            startNode.f = startNode.g + startNode.h;
+            openSet.add(startNode);
+            allNodes.put(startNode.key(), startNode);
 
-        while (!openSet.isEmpty()) {
-            Node current = openSet.poll();
-            if (current.key().equals(endNode.key())) {
-                return reconstructPath(current);
-            }
+            while (!openSet.isEmpty()) {
+                Node current = openSet.poll();
+                if (current.key().equals(endNode.key())) {
+                    return reconstructPath(current);
+                }
 
-            closedSet.add(current.key());
+                closedSet.add(current.key());
 
-            for (Node neighbor : getNeighbors(current)) {
-                if (closedSet.contains(neighbor.key()))
-                    continue;
+                for (Node neighbor : getNeighbors(current)) {
+                    if (closedSet.contains(neighbor.key()))
+                        continue;
 
-                // Check terrain constraints
-                Point3D p = new Point3D(neighbor.x * 20 + 10, neighbor.y * 20 + 10, 0);
-                boolean land = isLand(p);
-                if (isMarine && land)
-                    continue; // Marine cannot go on land
-                if (!isMarine && !land)
-                    continue; // Land vehicle cannot go on water (assuming isMarine=false means Land vehicle)
-                // Note: Aerial vehicles shouldn't use this pathfinder or should have
-                // isMarine=null logic?
-                // For now, let's assume this method is only called for Surface/Land vehicles.
+                    // Check terrain constraints
+                    Point3D p = new Point3D(neighbor.x * 20 + 10, neighbor.y * 20 + 10, 0);
+                    boolean land = isLand(p);
+                    if (isMarine && land)
+                        continue; // Marine cannot go on land
+                    if (!isMarine && !land)
+                        continue; // Land vehicle cannot go on water (assuming isMarine=false means Land vehicle)
+                    // Note: Aerial vehicles shouldn't use this pathfinder or should have
+                    // isMarine=null logic?
+                    // For now, let's assume this method is only called for Surface/Land vehicles.
 
-                double tentativeG = current.g + 1; // Cost 1 per step
+                    double tentativeG = current.g + 1; // Cost 1 per step
 
-                Node existing = allNodes.get(neighbor.key());
-                if (existing == null || tentativeG < existing.g) {
-                    neighbor.parent = current;
-                    neighbor.g = tentativeG;
-                    neighbor.h = heuristic(neighbor, endNode);
-                    neighbor.f = neighbor.g + neighbor.h;
+                    Node existing = allNodes.get(neighbor.key());
+                    if (existing == null || tentativeG < existing.g) {
+                        neighbor.parent = current;
+                        neighbor.g = tentativeG;
+                        neighbor.h = heuristic(neighbor, endNode);
+                        neighbor.f = neighbor.g + neighbor.h;
 
-                    if (existing == null) {
-                        allNodes.put(neighbor.key(), neighbor);
-                        openSet.add(neighbor);
-                    } else {
-                        // Update existing (re-add to sort)
-                        openSet.remove(existing);
-                        existing.g = neighbor.g;
-                        existing.f = neighbor.f;
-                        existing.parent = current;
-                        openSet.add(existing);
+                        if (existing == null) {
+                            allNodes.put(neighbor.key(), neighbor);
+                            openSet.add(neighbor);
+                        } else {
+                            // Update existing (re-add to sort)
+                            openSet.remove(existing);
+                            existing.g = neighbor.g;
+                            existing.f = neighbor.f;
+                            existing.parent = current;
+                            openSet.add(existing);
+                        }
                     }
                 }
             }
-        }
 
-        // No path found, return direct line (fallback)
-        List<Point3D> fallback = new ArrayList<>();
-        fallback.add(end);
-        return fallback;
+            // No path found, return direct line (fallback)
+            List<Point3D> fallback = new ArrayList<>();
+            fallback.add(end);
+            return fallback;
+        } catch (Exception e) {
+            System.err.println("Error in pathfinding: " + e.getMessage());
+            e.printStackTrace();
+            // Return fallback path
+            List<Point3D> fallback = new ArrayList<>();
+            fallback.add(end);
+            return fallback;
+        }
     }
 
     private double heuristic(Node a, Node b) {

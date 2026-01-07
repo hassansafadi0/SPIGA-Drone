@@ -23,29 +23,58 @@ public abstract class Mission {
      * @param actif The mobile asset to assign.
      */
     public void assignerActif(ActifMobile actif) {
-        this.actifsAssignes.add(actif);
+        try {
+            if (actif == null) {
+                System.err.println("Cannot assign null asset to mission " + id);
+                return;
+            }
+            this.actifsAssignes.add(actif);
+        } catch (Exception e) {
+            System.err.println("Error assigning asset to mission " + id + ": " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
      * Starts the mission.
      */
     public void demarrer() {
-        this.statut = StatutMission.EN_COURS;
-        for (ActifMobile actif : actifsAssignes) {
-            actif.demarrer();
+        try {
+            this.statut = StatutMission.EN_COURS;
+            for (ActifMobile actif : actifsAssignes) {
+                try {
+                    actif.demarrer();
+                } catch (Exception e) {
+                    System.err.println(
+                            "Error starting asset " + actif.getId() + " for mission " + id + ": " + e.getMessage());
+                }
+            }
+            System.out.println("Mission " + id + " démarrée.");
+        } catch (Exception e) {
+            System.err.println("Error starting mission " + id + ": " + e.getMessage());
+            e.printStackTrace();
         }
-        System.out.println("Mission " + id + " démarrée.");
     }
 
     /**
      * Terminates the mission.
      */
     public void terminer() {
-        this.statut = StatutMission.TERMINEE;
-        for (ActifMobile actif : actifsAssignes) {
-            actif.arreter(); // Or return to base
+        try {
+            this.statut = StatutMission.TERMINEE;
+            for (ActifMobile actif : actifsAssignes) {
+                try {
+                    actif.arreter(); // Or return to base
+                } catch (Exception e) {
+                    System.err.println(
+                            "Error stopping asset " + actif.getId() + " for mission " + id + ": " + e.getMessage());
+                }
+            }
+            System.out.println("Mission " + id + " terminée.");
+        } catch (Exception e) {
+            System.err.println("Error terminating mission " + id + ": " + e.getMessage());
+            e.printStackTrace();
         }
-        System.out.println("Mission " + id + " terminée.");
     }
 
     /**

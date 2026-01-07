@@ -3,24 +3,24 @@ spiga-simulator,com.spiga.mission,MissionReconnaissance,0,5,0,0,0,2,0,1,0,1
 spiga-simulator,com.spiga.mission,StatutMission,0,21,0,0,0,4,0,1,0,1
 spiga-simulator,com.spiga.mission,ObjectifMission,0,21,0,0,0,4,0,1,0,1
 spiga-simulator,com.spiga.mission,GestionnaireEssaim,0,54,0,4,0,13,0,9,0,7
-spiga-simulator,com.spiga.mission,Mission,26,53,2,2,7,17,3,6,2,5
-spiga-simulator,com.spiga.ui,SimulationView,764,0,62,0,128,0,43,0,12,0
+spiga-simulator,com.spiga.mission,Mission,84,58,3,3,26,21,4,6,2,5
+spiga-simulator,com.spiga.ui,SimulationView,863,0,70,0,167,0,47,0,12,0
 spiga-simulator,com.spiga.ui,Dashboard,689,0,28,0,129,0,25,0,11,0
-spiga-simulator,com.spiga.ui,SimulationView.new AnimationTimer() {...},33,0,4,0,8,0,4,0,2,0
-spiga-simulator,com.spiga.ui,ConsoleInterface,326,0,26,0,83,0,24,0,7,0
+spiga-simulator,com.spiga.ui,SimulationView.new AnimationTimer() {...},42,0,4,0,12,0,4,0,2,0
+spiga-simulator,com.spiga.ui,ConsoleInterface,426,0,42,0,117,0,32,0,7,0
 spiga-simulator,com.spiga.ui,MainApp,388,0,26,0,86,0,23,0,8,0
 spiga-simulator,com.spiga.env,ZoneOperation.Node,0,15,0,0,0,5,0,2,0,2
-spiga-simulator,com.spiga.env,ZoneOperation,42,614,10,54,14,99,15,37,5,15
+spiga-simulator,com.spiga.env,ZoneOperation,92,616,10,54,32,101,15,37,5,15
 spiga-simulator,com.spiga.env,Obstacle,0,52,0,2,0,8,0,3,0,2
 spiga-simulator,com.spiga.env,ZoneOperation.Island,15,87,0,12,5,10,5,8,5,2
 spiga-simulator,com.spiga.core,DroneReconnaissance,32,36,0,0,8,11,4,5,4,5
 spiga-simulator,com.spiga.core,DroneLogistique,0,68,0,0,0,19,0,9,0,9
-spiga-simulator,com.spiga.core,ActifMarin,52,200,18,14,19,41,17,2,1,2
+spiga-simulator,com.spiga.core,ActifMarin,79,201,18,14,27,42,17,2,1,2
 spiga-simulator,com.spiga.core,VehiculeSurface,49,18,0,0,13,4,6,2,6,2
 spiga-simulator,com.spiga.core,EtatOperationnel,0,27,0,0,0,5,0,1,0,1
 spiga-simulator,com.spiga.core,TypeAlerte,0,39,0,0,0,7,0,1,0,1
-spiga-simulator,com.spiga.core,VehiculeTerrestre,95,160,14,12,30,36,19,4,7,3
+spiga-simulator,com.spiga.core,VehiculeTerrestre,122,161,14,12,38,37,19,4,7,3
 spiga-simulator,com.spiga.core,ActifMobile,90,72,4,0,24,27,11,13,9,13
 spiga-simulator,com.spiga.core,Point3D,8,33,0,0,4,11,2,6,2,6
 spiga-simulator,com.spiga.core,VehiculeSousMarin,46,7,0,0,12,2,6,1,6,1
-spiga-simulator,com.spiga.core,ActifAerien,28,171,6,16,8,39,7,7,1,2
+spiga-simulator,com.spiga.core,ActifAerien,55,172,6,16,16,40,7,7,1,2

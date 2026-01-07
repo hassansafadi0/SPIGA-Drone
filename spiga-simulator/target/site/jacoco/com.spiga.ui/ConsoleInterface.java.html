@@ -39,124 +39,175 @@ public class ConsoleInterface {
     public void demarrer() {
 <span class="nc" id="L40">        boolean running = true;</span>
 <span class="nc bnc" id="L41" title="All 2 branches missed.">        while (running) {</span>
-<span class="nc" id="L42">            System.out.println(&quot;\n--- SPIGA Simulator Console ---&quot;);</span>
-<span class="nc" id="L43">            System.out.println(&quot;1. Ajouter un actif&quot;);</span>
-<span class="nc" id="L44">            System.out.println(&quot;2. Lister la flotte&quot;);</span>
-<span class="nc" id="L45">            System.out.println(&quot;3. Créer une mission&quot;);</span>
-<span class="nc" id="L46">            System.out.println(&quot;4. Simuler un pas de temps&quot;);</span>
-<span class="nc" id="L47">            System.out.println(&quot;5. Quitter&quot;);</span>
-<span class="nc" id="L48">            System.out.print(&quot;Choix: &quot;);</span>
+            try {
+<span class="nc" id="L43">                System.out.println(&quot;\n--- SPIGA Simulator Console ---&quot;);</span>
+<span class="nc" id="L44">                System.out.println(&quot;1. Ajouter un actif&quot;);</span>
+<span class="nc" id="L45">                System.out.println(&quot;2. Lister la flotte&quot;);</span>
+<span class="nc" id="L46">                System.out.println(&quot;3. Créer une mission&quot;);</span>
+<span class="nc" id="L47">                System.out.println(&quot;4. Simuler un pas de temps&quot;);</span>
+<span class="nc" id="L48">                System.out.println(&quot;5. Quitter&quot;);</span>
+<span class="nc" id="L49">                System.out.print(&quot;Choix: &quot;);</span>
 
-<span class="nc" id="L50">            String choix = scanner.nextLine();</span>
-<span class="nc bnc" id="L51" title="All 6 branches missed.">            switch (choix) {</span>
-                case &quot;1&quot;:
-<span class="nc" id="L53">                    ajouterActif();</span>
-<span class="nc" id="L54">                    break;</span>
-                case &quot;2&quot;:
-<span class="nc" id="L56">                    listerFlotte();</span>
-<span class="nc" id="L57">                    break;</span>
-                case &quot;3&quot;:
-<span class="nc" id="L59">                    creerMission();</span>
-<span class="nc" id="L60">                    break;</span>
-                case &quot;4&quot;:
-<span class="nc" id="L62">                    simulerPasDeTemps();</span>
-<span class="nc" id="L63">                    break;</span>
-                case &quot;5&quot;:
-<span class="nc" id="L65">                    running = false;</span>
-<span class="nc" id="L66">                    break;</span>
-                default:
-<span class="nc" id="L68">                    System.out.println(&quot;Choix invalide.&quot;);</span>
-            }
-<span class="nc" id="L70">        }</span>
-<span class="nc" id="L71">    }</span>
+<span class="nc" id="L51">                String choix = scanner.nextLine();</span>
+<span class="nc bnc" id="L52" title="All 6 branches missed.">                switch (choix) {</span>
+                    case &quot;1&quot;:
+<span class="nc" id="L54">                        ajouterActif();</span>
+<span class="nc" id="L55">                        break;</span>
+                    case &quot;2&quot;:
+<span class="nc" id="L57">                        listerFlotte();</span>
+<span class="nc" id="L58">                        break;</span>
+                    case &quot;3&quot;:
+<span class="nc" id="L60">                        creerMission();</span>
+<span class="nc" id="L61">                        break;</span>
+                    case &quot;4&quot;:
+<span class="nc" id="L63">                        simulerPasDeTemps();</span>
+<span class="nc" id="L64">                        break;</span>
+                    case &quot;5&quot;:
+<span class="nc" id="L66">                        running = false;</span>
+<span class="nc" id="L67">                        break;</span>
+                    default:
+<span class="nc" id="L69">                        System.out.println(&quot;Choix invalide.&quot;);</span>
+                }
+<span class="nc" id="L71">            } catch (Exception e) {</span>
+<span class="nc" id="L72">                System.out.println(&quot;Erreur lors du traitement de la commande: &quot; + e.getMessage());</span>
+<span class="nc" id="L73">                e.printStackTrace();</span>
+<span class="nc" id="L74">            }</span>
+        }
+<span class="nc" id="L76">    }</span>
 
     /**
      * Prompts the user to add a new asset.
      */
     private void ajouterActif() {
-<span class="nc" id="L77">        System.out.print(&quot;ID: &quot;);</span>
-<span class="nc" id="L78">        String id = scanner.nextLine();</span>
-<span class="nc" id="L79">        System.out.println(&quot;Type (1: Recon, 2: Logistique, 3: Surface, 4: Sous-marin, 5: Terrestre): &quot;);</span>
-<span class="nc" id="L80">        String type = scanner.nextLine();</span>
+        try {
+<span class="nc" id="L83">            System.out.print(&quot;ID: &quot;);</span>
+<span class="nc" id="L84">            String id = scanner.nextLine();</span>
+            
+<span class="nc bnc" id="L86" title="All 4 branches missed.">            if (id == null || id.trim().isEmpty()) {</span>
+<span class="nc" id="L87">                System.out.println(&quot;Erreur: L'ID ne peut pas être vide.&quot;);</span>
+<span class="nc" id="L88">                return;</span>
+            }
+            
+<span class="nc" id="L91">            System.out.println(&quot;Type (1: Recon, 2: Logistique, 3: Surface, 4: Sous-marin, 5: Terrestre): &quot;);</span>
+<span class="nc" id="L92">            String type = scanner.nextLine();</span>
 
-<span class="nc" id="L82">        ActifMobile actif = null;</span>
+<span class="nc" id="L94">            ActifMobile actif = null;</span>
 
-<span class="nc bnc" id="L84" title="All 6 branches missed.">        switch (type) {</span>
-            case &quot;1&quot;:
-<span class="nc" id="L86">                actif = new DroneReconnaissance(id, new Point3D(0, 0, 50));</span>
-<span class="nc" id="L87">                break;</span>
-            case &quot;2&quot;:
-<span class="nc" id="L89">                actif = new DroneLogistique(id, new Point3D(0, 0, 10));</span>
-<span class="nc" id="L90">                break;</span>
-            case &quot;3&quot;:
-<span class="nc" id="L92">                actif = new VehiculeSurface(id, new Point3D(0, 0, 0));</span>
-<span class="nc" id="L93">                break;</span>
-            case &quot;4&quot;:
-<span class="nc" id="L95">                actif = new VehiculeSousMarin(id, new Point3D(0, 0, -50));</span>
-<span class="nc" id="L96">                break;</span>
-            case &quot;5&quot;:
-<span class="nc" id="L98">                actif = new VehiculeTerrestre(id, new Point3D(0, 0, 0));</span>
-<span class="nc" id="L99">                break;</span>
-            default:
-<span class="nc" id="L101">                System.out.println(&quot;Type inconnu.&quot;);</span>
-<span class="nc" id="L102">                return;</span>
-        }
+<span class="nc bnc" id="L96" title="All 6 branches missed.">            switch (type) {</span>
+                case &quot;1&quot;:
+<span class="nc" id="L98">                    actif = new DroneReconnaissance(id, new Point3D(0, 0, 50));</span>
+<span class="nc" id="L99">                    break;</span>
+                case &quot;2&quot;:
+<span class="nc" id="L101">                    actif = new DroneLogistique(id, new Point3D(0, 0, 10));</span>
+<span class="nc" id="L102">                    break;</span>
+                case &quot;3&quot;:
+<span class="nc" id="L104">                    actif = new VehiculeSurface(id, new Point3D(0, 0, 0));</span>
+<span class="nc" id="L105">                    break;</span>
+                case &quot;4&quot;:
+<span class="nc" id="L107">                    actif = new VehiculeSousMarin(id, new Point3D(0, 0, -50));</span>
+<span class="nc" id="L108">                    break;</span>
+                case &quot;5&quot;:
+<span class="nc" id="L110">                    actif = new VehiculeTerrestre(id, new Point3D(0, 0, 0));</span>
+<span class="nc" id="L111">                    break;</span>
+                default:
+<span class="nc" id="L113">                    System.out.println(&quot;Type inconnu.&quot;);</span>
+<span class="nc" id="L114">                    return;</span>
+            }
 
-<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (actif != null) {</span>
-<span class="nc" id="L106">            gestionnaire.ajouterActif(actif);</span>
-<span class="nc" id="L107">            zone.addCollidable(actif); // Register for collision detection</span>
-<span class="nc" id="L108">            System.out.println(&quot;Actif ajouté : &quot; + actif.getId());</span>
-        }
-<span class="nc" id="L110">    }</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">            if (actif != null) {</span>
+<span class="nc" id="L118">                gestionnaire.ajouterActif(actif);</span>
+<span class="nc" id="L119">                zone.addCollidable(actif); // Register for collision detection</span>
+<span class="nc" id="L120">                System.out.println(&quot;Actif ajouté : &quot; + actif.getId());</span>
+            }
+<span class="nc" id="L122">        } catch (Exception e) {</span>
+<span class="nc" id="L123">            System.out.println(&quot;Erreur lors de l'ajout de l'actif: &quot; + e.getMessage());</span>
+<span class="nc" id="L124">            e.printStackTrace();</span>
+<span class="nc" id="L125">        }</span>
+<span class="nc" id="L126">    }</span>
 
     /**
      * Lists all assets in the fleet with their status and position.
      */
     private void listerFlotte() {
-<span class="nc" id="L116">        System.out.println(&quot;\n--- Flotte ---&quot;);</span>
-<span class="nc bnc" id="L117" title="All 2 branches missed.">        for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
-<span class="nc" id="L118">            System.out.printf(&quot;%s [%s] - %s - Pos: %s%n&quot;,</span>
-<span class="nc" id="L119">                    actif.getId(),</span>
-<span class="nc" id="L120">                    actif.getClass().getSimpleName(),</span>
-<span class="nc" id="L121">                    actif.getEtat(),</span>
-<span class="nc" id="L122">                    actif.getPosition());</span>
-<span class="nc" id="L123">        }</span>
-<span class="nc" id="L124">    }</span>
+        try {
+<span class="nc" id="L133">            System.out.println(&quot;\n--- Flotte ---&quot;);</span>
+<span class="nc bnc" id="L134" title="All 4 branches missed.">            if (gestionnaire.getFlotte() == null || gestionnaire.getFlotte().isEmpty()) {</span>
+<span class="nc" id="L135">                System.out.println(&quot;Aucun actif dans la flotte.&quot;);</span>
+<span class="nc" id="L136">                return;</span>
+            }
+            
+<span class="nc bnc" id="L139" title="All 2 branches missed.">            for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
+<span class="nc" id="L140">                System.out.printf(&quot;%s [%s] - %s - Pos: %s%n&quot;,</span>
+<span class="nc" id="L141">                        actif.getId(),</span>
+<span class="nc" id="L142">                        actif.getClass().getSimpleName(),</span>
+<span class="nc" id="L143">                        actif.getEtat(),</span>
+<span class="nc" id="L144">                        actif.getPosition());</span>
+<span class="nc" id="L145">            }</span>
+<span class="nc" id="L146">        } catch (Exception e) {</span>
+<span class="nc" id="L147">            System.out.println(&quot;Erreur lors de l'affichage de la flotte: &quot; + e.getMessage());</span>
+<span class="nc" id="L148">            e.printStackTrace();</span>
+<span class="nc" id="L149">        }</span>
+<span class="nc" id="L150">    }</span>
 
     /**
      * Creates and assigns a mission to an available asset.
      */
     private void creerMission() {
-<span class="nc" id="L130">        System.out.print(&quot;ID Mission: &quot;);</span>
-<span class="nc" id="L131">        String id = scanner.nextLine();</span>
-<span class="nc" id="L132">        Mission mission = new MissionReconnaissance(id);</span>
+        try {
+<span class="nc" id="L157">            System.out.print(&quot;ID Mission: &quot;);</span>
+<span class="nc" id="L158">            String id = scanner.nextLine();</span>
+            
+<span class="nc bnc" id="L160" title="All 4 branches missed.">            if (id == null || id.trim().isEmpty()) {</span>
+<span class="nc" id="L161">                System.out.println(&quot;Erreur: L'ID de mission ne peut pas être vide.&quot;);</span>
+<span class="nc" id="L162">                return;</span>
+            }
+            
+<span class="nc" id="L165">            Mission mission = new MissionReconnaissance(id);</span>
 
-        // Auto assign first available asset
-<span class="nc" id="L135">        ActifMobile asset = gestionnaire.suggererActif(10);</span>
-<span class="nc bnc" id="L136" title="All 2 branches missed.">        if (asset != null) {</span>
-<span class="nc" id="L137">            mission.assignerActif(asset);</span>
-<span class="nc" id="L138">            mission.demarrer();</span>
-<span class="nc" id="L139">            System.out.println(&quot;Mission &quot; + id + &quot; assignée à &quot; + asset.getId() + &quot; et démarrée.&quot;);</span>
-        } else {
-<span class="nc" id="L141">            System.out.println(&quot;Aucun actif disponible pour cette mission.&quot;);</span>
-        }
-<span class="nc" id="L143">    }</span>
+            // Auto assign first available asset
+<span class="nc" id="L168">            ActifMobile asset = gestionnaire.suggererActif(10);</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">            if (asset != null) {</span>
+<span class="nc" id="L170">                mission.assignerActif(asset);</span>
+<span class="nc" id="L171">                mission.demarrer();</span>
+<span class="nc" id="L172">                System.out.println(&quot;Mission &quot; + id + &quot; assignée à &quot; + asset.getId() + &quot; et démarrée.&quot;);</span>
+            } else {
+<span class="nc" id="L174">                System.out.println(&quot;Aucun actif disponible pour cette mission.&quot;);</span>
+            }
+<span class="nc" id="L176">        } catch (Exception e) {</span>
+<span class="nc" id="L177">            System.out.println(&quot;Erreur lors de la création de la mission: &quot; + e.getMessage());</span>
+<span class="nc" id="L178">            e.printStackTrace();</span>
+<span class="nc" id="L179">        }</span>
+<span class="nc" id="L180">    }</span>
 
     /**
      * Simulates a time step by moving assets.
      */
     private void simulerPasDeTemps() {
-<span class="nc" id="L149">        System.out.println(&quot;Simulation d'un pas de temps...&quot;);</span>
-        // Simple simulation: move all assets towards a dummy target
-<span class="nc" id="L151">        Point3D target = new Point3D(100, 100, 50);</span>
+        try {
+<span class="nc" id="L187">            System.out.println(&quot;Simulation d'un pas de temps...&quot;);</span>
+            // Simple simulation: move all assets towards a dummy target
+<span class="nc" id="L189">            Point3D target = new Point3D(100, 100, 50);</span>
 
-<span class="nc bnc" id="L153" title="All 2 branches missed.">        for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
-<span class="nc bnc" id="L154" title="All 4 branches missed.">            if (actif.getEtat() == EtatOperationnel.EN_MISSION || actif.getEtat() == EtatOperationnel.AU_SOL) {</span>
-<span class="nc" id="L155">                actif.deplacer(target, zone);</span>
-<span class="nc" id="L156">                System.out.println(actif.getId() + &quot; déplacé vers &quot; + actif.getPosition());</span>
+<span class="nc bnc" id="L191" title="All 4 branches missed.">            if (gestionnaire.getFlotte() == null || gestionnaire.getFlotte().isEmpty()) {</span>
+<span class="nc" id="L192">                System.out.println(&quot;Aucun actif à déplacer.&quot;);</span>
+<span class="nc" id="L193">                return;</span>
             }
-<span class="nc" id="L158">        }</span>
-<span class="nc" id="L159">    }</span>
+
+<span class="nc bnc" id="L196" title="All 2 branches missed.">            for (ActifMobile actif : gestionnaire.getFlotte()) {</span>
+                try {
+<span class="nc bnc" id="L198" title="All 4 branches missed.">                    if (actif.getEtat() == EtatOperationnel.EN_MISSION || actif.getEtat() == EtatOperationnel.AU_SOL) {</span>
+<span class="nc" id="L199">                        actif.deplacer(target, zone);</span>
+<span class="nc" id="L200">                        System.out.println(actif.getId() + &quot; déplacé vers &quot; + actif.getPosition());</span>
+                    }
+<span class="nc" id="L202">                } catch (Exception e) {</span>
+<span class="nc" id="L203">                    System.out.println(&quot;Erreur lors du déplacement de &quot; + actif.getId() + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L204">                }</span>
+<span class="nc" id="L205">            }</span>
+<span class="nc" id="L206">        } catch (Exception e) {</span>
+<span class="nc" id="L207">            System.out.println(&quot;Erreur lors de la simulation: &quot; + e.getMessage());</span>
+<span class="nc" id="L208">            e.printStackTrace();</span>
+<span class="nc" id="L209">        }</span>
+<span class="nc" id="L210">    }</span>
 
     /**
      * Main entry point for the console interface.
@@ -164,9 +215,9 @@ public class ConsoleInterface {
      * @param args Command line arguments.
      */
     public static void main(String[] args) {
-<span class="nc" id="L167">        GestionnaireEssaim gestionnaire = new GestionnaireEssaim();</span>
-<span class="nc" id="L168">        ConsoleInterface console = new ConsoleInterface(gestionnaire);</span>
-<span class="nc" id="L169">        console.demarrer();</span>
-<span class="nc" id="L170">    }</span>
+<span class="nc" id="L218">        GestionnaireEssaim gestionnaire = new GestionnaireEssaim();</span>
+<span class="nc" id="L219">        ConsoleInterface console = new ConsoleInterface(gestionnaire);</span>
+<span class="nc" id="L220">        console.demarrer();</span>
+<span class="nc" id="L221">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

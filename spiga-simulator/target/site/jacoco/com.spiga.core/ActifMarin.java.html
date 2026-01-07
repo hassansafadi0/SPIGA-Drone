@@ -32,111 +32,123 @@ public abstract class ActifMarin extends ActifMobile {
      */
     @Override
     public void deplacer(Point3D cible, ZoneOperation zone) {
-<span class="pc bpc" id="L35" title="2 of 4 branches missed.">        if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() &lt;= 0) {</span>
-<span class="nc" id="L36">            return;</span>
-        }
-
-<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if (getEtat() == EtatOperationnel.AU_SOL) {</span>
-<span class="fc" id="L40">            setEtat(EtatOperationnel.EN_MISSION);</span>
-        }
-
-        // Pathfinding Logic
-<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        if (getCurrentPath().isEmpty()) {</span>
-            // Calculate path if empty
-<span class="fc" id="L46">            List&lt;Point3D&gt; path = zone.findPath(getPosition(), cible, true); // true = isMarine</span>
-<span class="fc" id="L47">            setCurrentPath(path);</span>
-        }
-
-        // Get next waypoint
-<span class="fc" id="L51">        Point3D nextPoint = cible;</span>
-<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if (!getCurrentPath().isEmpty()) {</span>
-<span class="fc" id="L53">            nextPoint = getCurrentPath().get(0);</span>
-        }
-
-        // Similar logic but with currents
-<span class="fc" id="L57">        Point3D courant = zone.getCourantMarin();</span>
-
-<span class="fc" id="L59">        double dx = nextPoint.getX() - getPosition().getX();</span>
-<span class="fc" id="L60">        double dy = nextPoint.getY() - getPosition().getY();</span>
-<span class="fc" id="L61">        double dz = nextPoint.getZ() - getPosition().getZ();</span>
-<span class="fc" id="L62">        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);</span>
-
-<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (distance &lt; 5.0) { // Reached waypoint</span>
-<span class="nc bnc" id="L65" title="All 2 branches missed.">            if (!getCurrentPath().isEmpty()) {</span>
-<span class="nc" id="L66">                getCurrentPath().remove(0); // Remove reached point</span>
-<span class="nc bnc" id="L67" title="All 2 branches missed.">                if (getCurrentPath().isEmpty())</span>
-<span class="nc" id="L68">                    return; // Reached final target</span>
-                // Recurse or wait for next update to move to next point
-<span class="nc" id="L70">                return;</span>
+        try {
+<span class="pc bpc" id="L36" title="2 of 4 branches missed.">            if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() &lt;= 0) {</span>
+<span class="nc" id="L37">                return;</span>
             }
-        }
 
-<span class="fc" id="L74">        double nx = dx / distance;</span>
-<span class="fc" id="L75">        double ny = dy / distance;</span>
-<span class="fc" id="L76">        double nz = dz / distance;</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">            if (getEtat() == EtatOperationnel.AU_SOL) {</span>
+<span class="fc" id="L41">                setEtat(EtatOperationnel.EN_MISSION);</span>
+            }
 
-<span class="fc" id="L78">        double speed = getVitesseMax();</span>
+            // Pathfinding Logic
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">            if (getCurrentPath().isEmpty()) {</span>
+                // Calculate path if empty
+<span class="fc" id="L47">                List&lt;Point3D&gt; path = zone.findPath(getPosition(), cible, true); // true = isMarine</span>
+<span class="fc" id="L48">                setCurrentPath(path);</span>
+            }
 
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (speed &gt; distance) {</span>
-<span class="nc" id="L81">            speed = distance;</span>
-        }
+            // Get next waypoint
+<span class="fc" id="L52">            Point3D nextPoint = cible;</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">            if (!getCurrentPath().isEmpty()) {</span>
+<span class="fc" id="L54">                nextPoint = getCurrentPath().get(0);</span>
+            }
 
-<span class="fc" id="L84">        double moveX = nx * speed;</span>
-<span class="fc" id="L85">        double moveY = ny * speed;</span>
-<span class="fc" id="L86">        double moveZ = nz * speed;</span>
+            // Similar logic but with currents
+<span class="fc" id="L58">            Point3D courant = zone.getCourantMarin();</span>
 
-        // Apply current
-<span class="fc" id="L89">        moveX += courant.getX();</span>
-<span class="fc" id="L90">        moveY += courant.getY();</span>
-<span class="fc" id="L91">        moveZ += courant.getZ();</span>
+<span class="fc" id="L60">            double dx = nextPoint.getX() - getPosition().getX();</span>
+<span class="fc" id="L61">            double dy = nextPoint.getY() - getPosition().getY();</span>
+<span class="fc" id="L62">            double dz = nextPoint.getZ() - getPosition().getZ();</span>
+<span class="fc" id="L63">            double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);</span>
 
-<span class="fc" id="L93">        Point3D newPos = new Point3D(</span>
-<span class="fc" id="L94">                getPosition().getX() + moveX,</span>
-<span class="fc" id="L95">                getPosition().getY() + moveY,</span>
-<span class="fc" id="L96">                getPosition().getZ() + moveZ);</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">            if (distance &lt; 5.0) { // Reached waypoint</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">                if (!getCurrentPath().isEmpty()) {</span>
+<span class="nc" id="L67">                    getCurrentPath().remove(0); // Remove reached point</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">                    if (getCurrentPath().isEmpty())</span>
+<span class="nc" id="L69">                        return; // Reached final target</span>
+                    // Recurse or wait for next update to move to next point
+<span class="nc" id="L71">                    return;</span>
+                }
+            }
 
-<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if (!zone.isInside(newPos)) {</span>
-            // System.out.println(getId() + &quot; : Sortie de zone !&quot;);
-<span class="nc" id="L100">            return;</span>
-        }
-<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (zone.isCollision(newPos, this)) {</span>
-            // System.out.println(getId() + &quot; : Collision !&quot;);
-<span class="nc" id="L104">            notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);</span>
-<span class="nc" id="L105">            return;</span>
-        }
+<span class="fc" id="L75">            double nx = dx / distance;</span>
+<span class="fc" id="L76">            double ny = dy / distance;</span>
+<span class="fc" id="L77">            double nz = dz / distance;</span>
 
-        // Check Land Collision (for Marine)
-<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if (zone.isLand(newPos)) {</span>
-            // System.out.println(&quot;Marine vehicle hit land!&quot;);
-<span class="nc" id="L111">            return;</span>
-        }
+<span class="fc" id="L79">            double speed = getVitesseMax();</span>
 
-<span class="fc" id="L114">        setPosition(newPos);</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">            if (speed &gt; distance) {</span>
+<span class="nc" id="L82">                speed = distance;</span>
+            }
 
-<span class="fc" id="L116">        double consumption = 1.0;</span>
-        // Current opposition
-        // Simplified
-<span class="pc bpc" id="L119" title="3 of 6 branches missed.">        if (courant.getX() != 0 || courant.getY() != 0 || courant.getZ() != 0) {</span>
-<span class="nc" id="L120">            consumption += 0.5;</span>
-        }
+<span class="fc" id="L85">            double moveX = nx * speed;</span>
+<span class="fc" id="L86">            double moveY = ny * speed;</span>
+<span class="fc" id="L87">            double moveZ = nz * speed;</span>
 
-<span class="fc" id="L123">        setAutonomieActuelle(getAutonomieActuelle() - consumption);</span>
-<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        if (getAutonomieActuelle() &lt;= 0) {</span>
-<span class="nc" id="L125">            setAutonomieActuelle(0);</span>
-<span class="nc" id="L126">            setEtat(EtatOperationnel.EN_PANNE);</span>
-<span class="nc" id="L127">            notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);</span>
-        }
+            // Apply current
+<span class="fc" id="L90">            moveX += courant.getX();</span>
+<span class="fc" id="L91">            moveY += courant.getY();</span>
+<span class="fc" id="L92">            moveZ += courant.getZ();</span>
 
-        // System.out.println(getId() + &quot; moved to &quot; + getPosition() + &quot;. Autonomy: &quot; +
-        // getAutonomieActuelle());
-<span class="fc" id="L132">    }</span>
+<span class="fc" id="L94">            Point3D newPos = new Point3D(</span>
+<span class="fc" id="L95">                    getPosition().getX() + moveX,</span>
+<span class="fc" id="L96">                    getPosition().getY() + moveY,</span>
+<span class="fc" id="L97">                    getPosition().getZ() + moveZ);</span>
+
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">            if (!zone.isInside(newPos)) {</span>
+                // System.out.println(getId() + &quot; : Sortie de zone !&quot;);
+<span class="nc" id="L101">                return;</span>
+            }
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">            if (zone.isCollision(newPos, this)) {</span>
+                // System.out.println(getId() + &quot; : Collision !&quot;);
+<span class="nc" id="L105">                notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);</span>
+<span class="nc" id="L106">                return;</span>
+            }
+
+            // Check Land Collision (for Marine)
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">            if (zone.isLand(newPos)) {</span>
+                // System.out.println(&quot;Marine vehicle hit land!&quot;);
+<span class="nc" id="L112">                return;</span>
+            }
+
+<span class="fc" id="L115">            setPosition(newPos);</span>
+
+<span class="fc" id="L117">            double consumption = 1.0;</span>
+            // Current opposition
+            // Simplified
+<span class="pc bpc" id="L120" title="3 of 6 branches missed.">            if (courant.getX() != 0 || courant.getY() != 0 || courant.getZ() != 0) {</span>
+<span class="nc" id="L121">                consumption += 0.5;</span>
+            }
+
+<span class="fc" id="L124">            setAutonomieActuelle(getAutonomieActuelle() - consumption);</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">            if (getAutonomieActuelle() &lt;= 0) {</span>
+<span class="nc" id="L126">                setAutonomieActuelle(0);</span>
+<span class="nc" id="L127">                setEtat(EtatOperationnel.EN_PANNE);</span>
+<span class="nc" id="L128">                notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);</span>
+            }
+
+            // System.out.println(getId() + &quot; moved to &quot; + getPosition() + &quot;. Autonomy: &quot; +
+            // getAutonomieActuelle());
+<span class="nc" id="L133">        } catch (Exception e) {</span>
+<span class="nc" id="L134">            System.err.println(&quot;Error moving marine asset &quot; + getId() + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L135">            e.printStackTrace();</span>
+<span class="nc" id="L136">            setEtat(EtatOperationnel.EN_PANNE);</span>
+<span class="fc" id="L137">        }</span>
+<span class="fc" id="L138">    }</span>
 
     @Override
     public List&lt;Point3D&gt; calculerTrajet(Point3D cible) {
-<span class="nc" id="L136">        List&lt;Point3D&gt; path = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L137">        path.add(getPosition());</span>
-<span class="nc" id="L138">        path.add(cible);</span>
-<span class="nc" id="L139">        return path;</span>
+        try {
+<span class="nc" id="L143">            List&lt;Point3D&gt; path = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L144">            path.add(getPosition());</span>
+<span class="nc" id="L145">            path.add(cible);</span>
+<span class="nc" id="L146">            return path;</span>
+<span class="nc" id="L147">        } catch (Exception e) {</span>
+<span class="nc" id="L148">            System.err.println(&quot;Error calculating path for &quot; + getId() + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L149">            e.printStackTrace();</span>
+<span class="nc" id="L150">            return new ArrayList&lt;&gt;();</span>
+        }
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -31,101 +31,113 @@ public abstract class ActifAerien extends ActifMobile {
      */
     @Override
     public void deplacer(Point3D cible, ZoneOperation zone) {
-<span class="pc bpc" id="L34" title="2 of 4 branches missed.">        if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() &lt;= 0) {</span>
-<span class="nc" id="L35">            return;</span>
-        }
+        try {
+<span class="pc bpc" id="L35" title="2 of 4 branches missed.">            if (getEtat() == EtatOperationnel.EN_PANNE || getAutonomieActuelle() &lt;= 0) {</span>
+<span class="nc" id="L36">                return;</span>
+            }
 
-        // Auto-switch to EN_MISSION if moving
-<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (getEtat() == EtatOperationnel.AU_SOL) {</span>
-<span class="fc" id="L40">            setEtat(EtatOperationnel.EN_MISSION);</span>
-        }
+            // Auto-switch to EN_MISSION if moving
+<span class="fc bfc" id="L40" title="All 2 branches covered.">            if (getEtat() == EtatOperationnel.AU_SOL) {</span>
+<span class="fc" id="L41">                setEtat(EtatOperationnel.EN_MISSION);</span>
+            }
 
-        // Simple movement logic
-        // Check wind
-<span class="fc" id="L45">        Point3D vent = zone.getVent();</span>
-        // Wind affects speed or consumption? &quot;augmenter la consommation d'énergie et
-        // perturber le cap&quot;
+            // Simple movement logic
+            // Check wind
+<span class="fc" id="L46">            Point3D vent = zone.getVent();</span>
+            // Wind affects speed or consumption? &quot;augmenter la consommation d'énergie et
+            // perturber le cap&quot;
 
-        // Calculate direction
-<span class="fc" id="L50">        double dx = cible.getX() - getPosition().getX();</span>
-<span class="fc" id="L51">        double dy = cible.getY() - getPosition().getY();</span>
-<span class="fc" id="L52">        double dz = cible.getZ() - getPosition().getZ();</span>
-<span class="fc" id="L53">        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);</span>
+            // Calculate direction
+<span class="fc" id="L51">            double dx = cible.getX() - getPosition().getX();</span>
+<span class="fc" id="L52">            double dy = cible.getY() - getPosition().getY();</span>
+<span class="fc" id="L53">            double dz = cible.getZ() - getPosition().getZ();</span>
+<span class="fc" id="L54">            double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);</span>
 
-<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (distance == 0)</span>
-<span class="fc" id="L56">            return;</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            if (distance == 0)</span>
+<span class="fc" id="L57">                return;</span>
 
-        // Normalize
-<span class="fc" id="L59">        double nx = dx / distance;</span>
-<span class="fc" id="L60">        double ny = dy / distance;</span>
-<span class="fc" id="L61">        double nz = dz / distance;</span>
+            // Normalize
+<span class="fc" id="L60">            double nx = dx / distance;</span>
+<span class="fc" id="L61">            double ny = dy / distance;</span>
+<span class="fc" id="L62">            double nz = dz / distance;</span>
 
-        // Apply speed (simplified)
-<span class="fc" id="L64">        double speed = getVitesseMax();</span>
+            // Apply speed (simplified)
+<span class="fc" id="L65">            double speed = getVitesseMax();</span>
 
-        // Prevent overshooting
-<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (speed &gt; distance) {</span>
-<span class="fc" id="L68">            speed = distance;</span>
-        }
+            // Prevent overshooting
+<span class="fc bfc" id="L68" title="All 2 branches covered.">            if (speed &gt; distance) {</span>
+<span class="fc" id="L69">                speed = distance;</span>
+            }
 
-        // Wind effect (simplified: subtract wind vector from movement vector? Or add
-        // wind to position?)
-        // If wind is strong, it pushes the drone.
-        // Let's say effective movement = desired_movement + wind * factor
+            // Wind effect (simplified: subtract wind vector from movement vector? Or add
+            // wind to position?)
+            // If wind is strong, it pushes the drone.
+            // Let's say effective movement = desired_movement + wind * factor
 
-<span class="fc" id="L76">        double moveX = nx * speed;</span>
-<span class="fc" id="L77">        double moveY = ny * speed;</span>
-<span class="fc" id="L78">        double moveZ = nz * speed;</span>
+<span class="fc" id="L77">            double moveX = nx * speed;</span>
+<span class="fc" id="L78">            double moveY = ny * speed;</span>
+<span class="fc" id="L79">            double moveZ = nz * speed;</span>
 
-        // Update position
-<span class="fc" id="L81">        Point3D newPos = new Point3D(</span>
-<span class="fc" id="L82">                getPosition().getX() + moveX,</span>
-<span class="fc" id="L83">                getPosition().getY() + moveY,</span>
-<span class="fc" id="L84">                getPosition().getZ() + moveZ);</span>
+            // Update position
+<span class="fc" id="L82">            Point3D newPos = new Point3D(</span>
+<span class="fc" id="L83">                    getPosition().getX() + moveX,</span>
+<span class="fc" id="L84">                    getPosition().getY() + moveY,</span>
+<span class="fc" id="L85">                    getPosition().getZ() + moveZ);</span>
 
-        // Check collision/bounds
-<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (!zone.isInside(newPos)) {</span>
-            // System.out.println(getId() + &quot; : Sortie de zone !&quot;);
-<span class="nc" id="L89">            return;</span>
-        }
-<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (zone.isCollision(newPos, this)) {</span>
-            // System.out.println(getId() + &quot; : Collision détectée !&quot;);
-<span class="fc" id="L93">            notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);</span>
-<span class="fc" id="L94">            return;</span>
-        }
+            // Check collision/bounds
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">            if (!zone.isInside(newPos)) {</span>
+                // System.out.println(getId() + &quot; : Sortie de zone !&quot;);
+<span class="nc" id="L90">                return;</span>
+            }
+<span class="fc bfc" id="L92" title="All 2 branches covered.">            if (zone.isCollision(newPos, this)) {</span>
+                // System.out.println(getId() + &quot; : Collision détectée !&quot;);
+<span class="fc" id="L94">                notifierEtatCritique(TypeAlerte.COLLISION_IMMINENTE);</span>
+<span class="fc" id="L95">                return;</span>
+            }
 
-<span class="fc" id="L97">        setPosition(newPos);</span>
+<span class="fc" id="L98">            setPosition(newPos);</span>
 
-        // Consume energy
-        // Base consumption + wind factor + rain factor
-<span class="fc" id="L101">        double consumption = 1.0;</span>
-<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (zone.getPrecipitations() &gt; 0) {</span>
-<span class="nc" id="L103">            consumption += zone.getPrecipitations() * 0.1;</span>
-        }
-        // Wind opposition increases consumption
-        // Simplified: just add constant if wind is present
-<span class="pc bpc" id="L107" title="2 of 4 branches missed.">        if (vent.getX() != 0 || vent.getY() != 0) {</span>
-<span class="nc" id="L108">            consumption += 0.5;</span>
-        }
+            // Consume energy
+            // Base consumption + wind factor + rain factor
+<span class="fc" id="L102">            double consumption = 1.0;</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">            if (zone.getPrecipitations() &gt; 0) {</span>
+<span class="nc" id="L104">                consumption += zone.getPrecipitations() * 0.1;</span>
+            }
+            // Wind opposition increases consumption
+            // Simplified: just add constant if wind is present
+<span class="pc bpc" id="L108" title="2 of 4 branches missed.">            if (vent.getX() != 0 || vent.getY() != 0) {</span>
+<span class="nc" id="L109">                consumption += 0.5;</span>
+            }
 
-<span class="fc" id="L111">        setAutonomieActuelle(getAutonomieActuelle() - consumption);</span>
-<span class="fc bfc" id="L112" title="All 2 branches covered.">        if (getAutonomieActuelle() &lt;= 0) {</span>
-<span class="fc" id="L113">            setAutonomieActuelle(0);</span>
-<span class="fc" id="L114">            setEtat(EtatOperationnel.EN_PANNE); // Or forced landing</span>
-<span class="fc" id="L115">            notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);</span>
-        }
+<span class="fc" id="L112">            setAutonomieActuelle(getAutonomieActuelle() - consumption);</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">            if (getAutonomieActuelle() &lt;= 0) {</span>
+<span class="fc" id="L114">                setAutonomieActuelle(0);</span>
+<span class="fc" id="L115">                setEtat(EtatOperationnel.EN_PANNE); // Or forced landing</span>
+<span class="fc" id="L116">                notifierEtatCritique(TypeAlerte.BATTERIE_FAIBLE);</span>
+            }
 
-        // System.out.println(getId() + &quot; moved to &quot; + getPosition() + &quot;. Autonomy: &quot; +
-        // getAutonomieActuelle());
-<span class="fc" id="L120">    }</span>
+            // System.out.println(getId() + &quot; moved to &quot; + getPosition() + &quot;. Autonomy: &quot; +
+            // getAutonomieActuelle());
+<span class="nc" id="L121">        } catch (Exception e) {</span>
+<span class="nc" id="L122">            System.err.println(&quot;Error moving aerial asset &quot; + getId() + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L123">            e.printStackTrace();</span>
+<span class="nc" id="L124">            setEtat(EtatOperationnel.EN_PANNE);</span>
+<span class="fc" id="L125">        }</span>
+<span class="fc" id="L126">    }</span>
 
     @Override
     public List&lt;Point3D&gt; calculerTrajet(Point3D cible) {
-        // Simple direct path
-<span class="nc" id="L125">        List&lt;Point3D&gt; path = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L126">        path.add(getPosition());</span>
-<span class="nc" id="L127">        path.add(cible);</span>
-<span class="nc" id="L128">        return path;</span>
+        try {
+            // Simple direct path
+<span class="nc" id="L132">            List&lt;Point3D&gt; path = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L133">            path.add(getPosition());</span>
+<span class="nc" id="L134">            path.add(cible);</span>
+<span class="nc" id="L135">            return path;</span>
+<span class="nc" id="L136">        } catch (Exception e) {</span>
+<span class="nc" id="L137">            System.err.println(&quot;Error calculating path for &quot; + getId() + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L138">            e.printStackTrace();</span>
+<span class="nc" id="L139">            return new ArrayList&lt;&gt;();</span>
+        }
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

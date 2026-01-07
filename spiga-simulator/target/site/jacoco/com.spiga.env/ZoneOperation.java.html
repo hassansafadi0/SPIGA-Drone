@@ -182,33 +182,47 @@ public class ZoneOperation {
      * @return True if a collision is detected, false otherwise.
      */
     public boolean isCollision(Point3D point, Collidable ignoreMe) {
-        // Check static obstacles
-<span class="fc bfc" id="L186" title="All 2 branches covered.">        for (Obstacle obs : obstacles) {</span>
-<span class="fc bfc" id="L187" title="All 2 branches covered.">            if (obs.contains(point)) {</span>
-<span class="fc" id="L188">                return true;</span>
-            }
-<span class="fc" id="L190">        }</span>
+        try {
+            // Check static obstacles
+<span class="fc bfc" id="L187" title="All 2 branches covered.">            for (Obstacle obs : obstacles) {</span>
+                try {
+<span class="fc bfc" id="L189" title="All 2 branches covered.">                    if (obs.contains(point)) {</span>
+<span class="fc" id="L190">                        return true;</span>
+                    }
+<span class="nc" id="L192">                } catch (Exception e) {</span>
+<span class="nc" id="L193">                    System.err.println(&quot;Error checking obstacle collision: &quot; + e.getMessage());</span>
+<span class="fc" id="L194">                }</span>
+<span class="fc" id="L195">            }</span>
 
-        // Check dynamic collidables (vehicles)
-<span class="fc bfc" id="L193" title="All 2 branches covered.">        for (Collidable c : collidables) {</span>
-<span class="fc bfc" id="L194" title="All 2 branches covered.">            if (c == ignoreMe)</span>
-<span class="fc" id="L195">                continue;</span>
+            // Check dynamic collidables (vehicles)
+<span class="fc bfc" id="L198" title="All 2 branches covered.">            for (Collidable c : collidables) {</span>
+                try {
+<span class="fc bfc" id="L200" title="All 2 branches covered.">                    if (c == ignoreMe)</span>
+<span class="fc" id="L201">                        continue;</span>
 
-            // Check if at same Z level (with small tolerance)
-<span class="fc bfc" id="L198" title="All 2 branches covered.">            if (Math.abs(c.getPosition().getZ() - point.getZ()) &lt; 0.1) {</span>
-<span class="fc" id="L199">                double dist = Math.sqrt(</span>
-<span class="fc" id="L200">                        Math.pow(c.getPosition().getX() - point.getX(), 2) +</span>
-<span class="fc" id="L201">                                Math.pow(c.getPosition().getY() - point.getY(), 2));</span>
+                    // Check if at same Z level (with small tolerance)
+<span class="fc bfc" id="L204" title="All 2 branches covered.">                    if (Math.abs(c.getPosition().getZ() - point.getZ()) &lt; 0.1) {</span>
+<span class="fc" id="L205">                        double dist = Math.sqrt(</span>
+<span class="fc" id="L206">                                Math.pow(c.getPosition().getX() - point.getX(), 2) +</span>
+<span class="fc" id="L207">                                        Math.pow(c.getPosition().getY() - point.getY(), 2));</span>
 
-                // Assume default radius for the point being checked if not provided
-<span class="pc bpc" id="L204" title="1 of 2 branches missed.">                double myRadius = (ignoreMe != null) ? ignoreMe.getRadius() : 5.0;</span>
+                        // Assume default radius for the point being checked if not provided
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">                        double myRadius = (ignoreMe != null) ? ignoreMe.getRadius() : 5.0;</span>
 
-<span class="pc bpc" id="L206" title="1 of 2 branches missed.">                if (dist &lt; (c.getRadius() + myRadius)) {</span>
-<span class="fc" id="L207">                    return true;</span>
-                }
-            }
-<span class="fc" id="L210">        }</span>
-<span class="fc" id="L211">        return false;</span>
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">                        if (dist &lt; (c.getRadius() + myRadius)) {</span>
+<span class="fc" id="L213">                            return true;</span>
+                        }
+                    }
+<span class="nc" id="L216">                } catch (Exception e) {</span>
+<span class="nc" id="L217">                    System.err.println(&quot;Error checking collidable collision: &quot; + e.getMessage());</span>
+<span class="fc" id="L218">                }</span>
+<span class="fc" id="L219">            }</span>
+<span class="fc" id="L220">            return false;</span>
+<span class="nc" id="L221">        } catch (Exception e) {</span>
+<span class="nc" id="L222">            System.err.println(&quot;Error in collision detection: &quot; + e.getMessage());</span>
+<span class="nc" id="L223">            e.printStackTrace();</span>
+<span class="nc" id="L224">            return false;</span>
+        }
     }
 
     /**
@@ -218,9 +232,15 @@ public class ZoneOperation {
      * @return True if inside, false otherwise.
      */
     public boolean isInside(Point3D point) {
-<span class="pc bpc" id="L221" title="2 of 4 branches missed.">        return point.getX() &gt;= minCoord.getX() &amp;&amp; point.getX() &lt;= maxCoord.getX() &amp;&amp;</span>
-<span class="pc bpc" id="L222" title="2 of 4 branches missed.">                point.getY() &gt;= minCoord.getY() &amp;&amp; point.getY() &lt;= maxCoord.getY() &amp;&amp;</span>
-<span class="pc bpc" id="L223" title="2 of 4 branches missed.">                point.getZ() &gt;= minCoord.getZ() &amp;&amp; point.getZ() &lt;= maxCoord.getZ();</span>
+        try {
+<span class="pc bpc" id="L236" title="2 of 4 branches missed.">            return point.getX() &gt;= minCoord.getX() &amp;&amp; point.getX() &lt;= maxCoord.getX() &amp;&amp;</span>
+<span class="pc bpc" id="L237" title="2 of 4 branches missed.">                    point.getY() &gt;= minCoord.getY() &amp;&amp; point.getY() &lt;= maxCoord.getY() &amp;&amp;</span>
+<span class="pc bpc" id="L238" title="2 of 4 branches missed.">                    point.getZ() &gt;= minCoord.getZ() &amp;&amp; point.getZ() &lt;= maxCoord.getZ();</span>
+<span class="nc" id="L239">        } catch (Exception e) {</span>
+<span class="nc" id="L240">            System.err.println(&quot;Error checking if point is inside zone: &quot; + e.getMessage());</span>
+<span class="nc" id="L241">            e.printStackTrace();</span>
+<span class="nc" id="L242">            return false;</span>
+        }
     }
 
     // A* Pathfinding
@@ -234,100 +254,109 @@ public class ZoneOperation {
      * @return A list of points representing the path.
      */
     public List&lt;Point3D&gt; findPath(Point3D start, Point3D end, boolean isMarine) {
-        // Simple grid-based A*
-<span class="fc" id="L238">        Node startNode = new Node((int) (start.getX() / 20), (int) (start.getY() / 20));</span>
-<span class="fc" id="L239">        Node endNode = new Node((int) (end.getX() / 20), (int) (end.getY() / 20));</span>
+        try {
+            // Simple grid-based A*
+<span class="fc" id="L259">            Node startNode = new Node((int) (start.getX() / 20), (int) (start.getY() / 20));</span>
+<span class="fc" id="L260">            Node endNode = new Node((int) (end.getX() / 20), (int) (end.getY() / 20));</span>
 
-<span class="fc" id="L241">        java.util.PriorityQueue&lt;Node&gt; openSet = new java.util.PriorityQueue&lt;&gt;(</span>
-<span class="fc" id="L242">                java.util.Comparator.comparingDouble(n -&gt; n.f));</span>
-<span class="fc" id="L243">        java.util.Set&lt;String&gt; closedSet = new java.util.HashSet&lt;&gt;();</span>
-<span class="fc" id="L244">        java.util.Map&lt;String, Node&gt; allNodes = new java.util.HashMap&lt;&gt;();</span>
+<span class="fc" id="L262">            java.util.PriorityQueue&lt;Node&gt; openSet = new java.util.PriorityQueue&lt;&gt;(</span>
+<span class="fc" id="L263">                    java.util.Comparator.comparingDouble(n -&gt; n.f));</span>
+<span class="fc" id="L264">            java.util.Set&lt;String&gt; closedSet = new java.util.HashSet&lt;&gt;();</span>
+<span class="fc" id="L265">            java.util.Map&lt;String, Node&gt; allNodes = new java.util.HashMap&lt;&gt;();</span>
 
-<span class="fc" id="L246">        startNode.g = 0;</span>
-<span class="fc" id="L247">        startNode.h = heuristic(startNode, endNode);</span>
-<span class="fc" id="L248">        startNode.f = startNode.g + startNode.h;</span>
-<span class="fc" id="L249">        openSet.add(startNode);</span>
-<span class="fc" id="L250">        allNodes.put(startNode.key(), startNode);</span>
+<span class="fc" id="L267">            startNode.g = 0;</span>
+<span class="fc" id="L268">            startNode.h = heuristic(startNode, endNode);</span>
+<span class="fc" id="L269">            startNode.f = startNode.g + startNode.h;</span>
+<span class="fc" id="L270">            openSet.add(startNode);</span>
+<span class="fc" id="L271">            allNodes.put(startNode.key(), startNode);</span>
 
-<span class="fc bfc" id="L252" title="All 2 branches covered.">        while (!openSet.isEmpty()) {</span>
-<span class="fc" id="L253">            Node current = openSet.poll();</span>
-<span class="fc bfc" id="L254" title="All 2 branches covered.">            if (current.key().equals(endNode.key())) {</span>
-<span class="fc" id="L255">                return reconstructPath(current);</span>
-            }
-
-<span class="fc" id="L258">            closedSet.add(current.key());</span>
-
-<span class="fc bfc" id="L260" title="All 2 branches covered.">            for (Node neighbor : getNeighbors(current)) {</span>
-<span class="fc bfc" id="L261" title="All 2 branches covered.">                if (closedSet.contains(neighbor.key()))</span>
-<span class="fc" id="L262">                    continue;</span>
-
-                // Check terrain constraints
-<span class="fc" id="L265">                Point3D p = new Point3D(neighbor.x * 20 + 10, neighbor.y * 20 + 10, 0);</span>
-<span class="fc" id="L266">                boolean land = isLand(p);</span>
-<span class="fc bfc" id="L267" title="All 4 branches covered.">                if (isMarine &amp;&amp; land)</span>
-<span class="fc" id="L268">                    continue; // Marine cannot go on land</span>
-<span class="fc bfc" id="L269" title="All 4 branches covered.">                if (!isMarine &amp;&amp; !land)</span>
-<span class="fc" id="L270">                    continue; // Land vehicle cannot go on water (assuming isMarine=false means Land vehicle)</span>
-                // Note: Aerial vehicles shouldn't use this pathfinder or should have
-                // isMarine=null logic?
-                // For now, let's assume this method is only called for Surface/Land vehicles.
-
-<span class="fc" id="L275">                double tentativeG = current.g + 1; // Cost 1 per step</span>
-
-<span class="fc" id="L277">                Node existing = allNodes.get(neighbor.key());</span>
-<span class="pc bpc" id="L278" title="1 of 4 branches missed.">                if (existing == null || tentativeG &lt; existing.g) {</span>
-<span class="fc" id="L279">                    neighbor.parent = current;</span>
-<span class="fc" id="L280">                    neighbor.g = tentativeG;</span>
-<span class="fc" id="L281">                    neighbor.h = heuristic(neighbor, endNode);</span>
-<span class="fc" id="L282">                    neighbor.f = neighbor.g + neighbor.h;</span>
-
-<span class="pc bpc" id="L284" title="1 of 2 branches missed.">                    if (existing == null) {</span>
-<span class="fc" id="L285">                        allNodes.put(neighbor.key(), neighbor);</span>
-<span class="fc" id="L286">                        openSet.add(neighbor);</span>
-                    } else {
-                        // Update existing (re-add to sort)
-<span class="nc" id="L289">                        openSet.remove(existing);</span>
-<span class="nc" id="L290">                        existing.g = neighbor.g;</span>
-<span class="nc" id="L291">                        existing.f = neighbor.f;</span>
-<span class="nc" id="L292">                        existing.parent = current;</span>
-<span class="nc" id="L293">                        openSet.add(existing);</span>
-                    }
+<span class="fc bfc" id="L273" title="All 2 branches covered.">            while (!openSet.isEmpty()) {</span>
+<span class="fc" id="L274">                Node current = openSet.poll();</span>
+<span class="fc bfc" id="L275" title="All 2 branches covered.">                if (current.key().equals(endNode.key())) {</span>
+<span class="fc" id="L276">                    return reconstructPath(current);</span>
                 }
-<span class="fc" id="L296">            }</span>
-<span class="fc" id="L297">        }</span>
 
-        // No path found, return direct line (fallback)
-<span class="fc" id="L300">        List&lt;Point3D&gt; fallback = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L301">        fallback.add(end);</span>
-<span class="fc" id="L302">        return fallback;</span>
+<span class="fc" id="L279">                closedSet.add(current.key());</span>
+
+<span class="fc bfc" id="L281" title="All 2 branches covered.">                for (Node neighbor : getNeighbors(current)) {</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">                    if (closedSet.contains(neighbor.key()))</span>
+<span class="fc" id="L283">                        continue;</span>
+
+                    // Check terrain constraints
+<span class="fc" id="L286">                    Point3D p = new Point3D(neighbor.x * 20 + 10, neighbor.y * 20 + 10, 0);</span>
+<span class="fc" id="L287">                    boolean land = isLand(p);</span>
+<span class="fc bfc" id="L288" title="All 4 branches covered.">                    if (isMarine &amp;&amp; land)</span>
+<span class="fc" id="L289">                        continue; // Marine cannot go on land</span>
+<span class="fc bfc" id="L290" title="All 4 branches covered.">                    if (!isMarine &amp;&amp; !land)</span>
+<span class="fc" id="L291">                        continue; // Land vehicle cannot go on water (assuming isMarine=false means Land vehicle)</span>
+                    // Note: Aerial vehicles shouldn't use this pathfinder or should have
+                    // isMarine=null logic?
+                    // For now, let's assume this method is only called for Surface/Land vehicles.
+
+<span class="fc" id="L296">                    double tentativeG = current.g + 1; // Cost 1 per step</span>
+
+<span class="fc" id="L298">                    Node existing = allNodes.get(neighbor.key());</span>
+<span class="pc bpc" id="L299" title="1 of 4 branches missed.">                    if (existing == null || tentativeG &lt; existing.g) {</span>
+<span class="fc" id="L300">                        neighbor.parent = current;</span>
+<span class="fc" id="L301">                        neighbor.g = tentativeG;</span>
+<span class="fc" id="L302">                        neighbor.h = heuristic(neighbor, endNode);</span>
+<span class="fc" id="L303">                        neighbor.f = neighbor.g + neighbor.h;</span>
+
+<span class="pc bpc" id="L305" title="1 of 2 branches missed.">                        if (existing == null) {</span>
+<span class="fc" id="L306">                            allNodes.put(neighbor.key(), neighbor);</span>
+<span class="fc" id="L307">                            openSet.add(neighbor);</span>
+                        } else {
+                            // Update existing (re-add to sort)
+<span class="nc" id="L310">                            openSet.remove(existing);</span>
+<span class="nc" id="L311">                            existing.g = neighbor.g;</span>
+<span class="nc" id="L312">                            existing.f = neighbor.f;</span>
+<span class="nc" id="L313">                            existing.parent = current;</span>
+<span class="nc" id="L314">                            openSet.add(existing);</span>
+                        }
+                    }
+<span class="fc" id="L317">                }</span>
+<span class="fc" id="L318">            }</span>
+
+            // No path found, return direct line (fallback)
+<span class="fc" id="L321">            List&lt;Point3D&gt; fallback = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L322">            fallback.add(end);</span>
+<span class="fc" id="L323">            return fallback;</span>
+<span class="nc" id="L324">        } catch (Exception e) {</span>
+<span class="nc" id="L325">            System.err.println(&quot;Error in pathfinding: &quot; + e.getMessage());</span>
+<span class="nc" id="L326">            e.printStackTrace();</span>
+            // Return fallback path
+<span class="nc" id="L328">            List&lt;Point3D&gt; fallback = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L329">            fallback.add(end);</span>
+<span class="nc" id="L330">            return fallback;</span>
+        }
     }
 
     private double heuristic(Node a, Node b) {
-<span class="fc" id="L306">        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));</span>
+<span class="fc" id="L335">        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));</span>
     }
 
     private List&lt;Node&gt; getNeighbors(Node n) {
-<span class="fc" id="L310">        List&lt;Node&gt; neighbors = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L311">        int[] dx = { 0, 0, 1, -1, 1, 1, -1, -1 };</span>
-<span class="fc" id="L312">        int[] dy = { 1, -1, 0, 0, 1, -1, 1, -1 };</span>
+<span class="fc" id="L339">        List&lt;Node&gt; neighbors = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L340">        int[] dx = { 0, 0, 1, -1, 1, 1, -1, -1 };</span>
+<span class="fc" id="L341">        int[] dy = { 1, -1, 0, 0, 1, -1, 1, -1 };</span>
 
-<span class="fc bfc" id="L314" title="All 2 branches covered.">        for (int i = 0; i &lt; 8; i++) {</span>
-<span class="fc" id="L315">            int nx = n.x + dx[i];</span>
-<span class="fc" id="L316">            int ny = n.y + dy[i];</span>
-<span class="fc bfc" id="L317" title="All 8 branches covered.">            if (nx &gt;= 0 &amp;&amp; nx &lt; GRID_SIZE &amp;&amp; ny &gt;= 0 &amp;&amp; ny &lt; GRID_SIZE) { // Use GRID_SIZE here</span>
-<span class="fc" id="L318">                neighbors.add(new Node(nx, ny));</span>
+<span class="fc bfc" id="L343" title="All 2 branches covered.">        for (int i = 0; i &lt; 8; i++) {</span>
+<span class="fc" id="L344">            int nx = n.x + dx[i];</span>
+<span class="fc" id="L345">            int ny = n.y + dy[i];</span>
+<span class="fc bfc" id="L346" title="All 8 branches covered.">            if (nx &gt;= 0 &amp;&amp; nx &lt; GRID_SIZE &amp;&amp; ny &gt;= 0 &amp;&amp; ny &lt; GRID_SIZE) { // Use GRID_SIZE here</span>
+<span class="fc" id="L347">                neighbors.add(new Node(nx, ny));</span>
             }
         }
-<span class="fc" id="L321">        return neighbors;</span>
+<span class="fc" id="L350">        return neighbors;</span>
     }
 
     private List&lt;Point3D&gt; reconstructPath(Node current) {
-<span class="fc" id="L325">        List&lt;Point3D&gt; path = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L326" title="All 2 branches covered.">        while (current != null) {</span>
-<span class="fc" id="L327">            path.add(0, new Point3D(current.x * 20 + 10, current.y * 20 + 10, 0));</span>
-<span class="fc" id="L328">            current = current.parent;</span>
+<span class="fc" id="L354">        List&lt;Point3D&gt; path = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L355" title="All 2 branches covered.">        while (current != null) {</span>
+<span class="fc" id="L356">            path.add(0, new Point3D(current.x * 20 + 10, current.y * 20 + 10, 0));</span>
+<span class="fc" id="L357">            current = current.parent;</span>
         }
-<span class="fc" id="L330">        return path;</span>
+<span class="fc" id="L359">        return path;</span>
     }
 
     private static class Node {
@@ -335,13 +364,13 @@ public class ZoneOperation {
         double g, h, f;
         Node parent;
 
-<span class="fc" id="L338">        public Node(int x, int y) {</span>
-<span class="fc" id="L339">            this.x = x;</span>
-<span class="fc" id="L340">            this.y = y;</span>
-<span class="fc" id="L341">        }</span>
+<span class="fc" id="L367">        public Node(int x, int y) {</span>
+<span class="fc" id="L368">            this.x = x;</span>
+<span class="fc" id="L369">            this.y = y;</span>
+<span class="fc" id="L370">        }</span>
 
         public String key() {
-<span class="fc" id="L344">            return x + &quot;,&quot; + y;</span>
+<span class="fc" id="L373">            return x + &quot;,&quot; + y;</span>
         }
     }
 }
